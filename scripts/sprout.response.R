@@ -1,8 +1,7 @@
 #evaluates chips sprout metrics (basal area and height) by chips Fire RdNBR
-setwd("C:/Users/dnemens/Documents/CBO manuscript")
 
 #loads csv of sprout response data 
-sprout <- read.csv ("~/CBO manuscript/Data/data sheets/sprout.response.csv")
+sprout <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sprout.response.csv")
 
 #loads nesessary packages
 library(fitdistrplus)
@@ -22,7 +21,7 @@ chiprdnbr <- (sprout$chips_rdnbr)
 
 chipr.h <- chiprdnbr[which(sprout$num.Chips.sprouts>0)]
 
-#response variables######
+#######response variables######
 
 #chips sprout basal area per clump
 chipBAclump <- sprout$Chips.BA.clump
