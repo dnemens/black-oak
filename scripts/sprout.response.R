@@ -16,28 +16,27 @@ library(MASS)
 
 #independent variables
 plot <- (sprout$plot)
-storrdnbr <- (sprout$storrie_rdnbr)
 chiprdnbr <- (sprout$chips_rdnbr)
 
-chipr.h <- chiprdnbr[which(sprout$num.Chips.sprouts>0)]
+num <- sprout$num.Chips.sprouts[which(sprout$num.Chips.sprouts>0)]
+chipr.h <- chiprdnbr[which(num>0)]
 
 #######response variables######
 
 #chips sprout basal area per clump
 chipBAclump <- sprout$Chips.BA.clump
-BAclump <- chipBAclump[which(sprout$num.Chips.sprouts>0)]
+BAclump <- chipBAclump[which(num>0)]
 #chips sprout basal area per hectare
-chipBAha <- (sprout$Chips.BA.ha)
-BAha <- chipBAha[which(sprout$num.Chips.sprouts>0)]
-#chips sprout density per clump
-chipct <- (sprout$num.Chips.sprouts)
+chipBAha <- (sprout$Chips.BA.ha)*22.22
+BAha <- chipBAha[which(num>0)]
+
 #chips sprout crown area
 crown <- sprout$Mean.crown.area
-crown <- crown[which(sprout$num.Chips.sprouts>0)]
+crown <- crown[which(num>0)]
 
 #height of chips sprouts
 height <- sprout$Max.of.oak.live.emer.ht
-chip.height <- height[which(sprout$num.Chips.sprouts>0)]
+chip.height <- height[which(num>0)]
 
 #########################################################
 #analyses
@@ -45,17 +44,21 @@ chip.height <- height[which(sprout$num.Chips.sprouts>0)]
 #funtion for root mean square error
 rmse <- function(x) {sqrt(mean(x^2))}
 
-#exponential fit for BA per ha
-mod.exp <- lm(BAha)
+### looking at model that includes plots with no chips sprouts
+mod <- glm ((BAclump+.01)~chiprdnbr, family=Gamma(link="log"), control = list(maxit = 100))
+summary(mod)
+#diagnostics
+rmse(mod$residuals)
+nagelkerke(mod)
 
-#gamma dist glm for chips sprout BA/ha 
-ba.plus <- BAha+.01#add .1 b/c gamma needs positive response 
-mod1 <- glm (ba.plus~chipr.h, family=Gamma(link="log"), control = list(maxit = 100))
+#curve(predict(mod,data.frame(chiprdnbr=x), type="response"), add=TRUE, lwd=2, col="red")
+
+#gamma dist glm for chips sprout BA
+mod1 <- glm (BAclump~chipr.h, family=Gamma(link="log"), control = list(maxit = 100))
 summary(mod1)
 
 #model diagnostics
 rmse(mod1$residuals) #.26
-library(rcompanion)
 nagelkerke(mod1)
 
 #gam
@@ -83,7 +86,7 @@ summary (ht.lm)
 #######################################################################
 #produces stacked sprout metric plots (basal area and height)
 
-tiff(filename="C:/Users/dnemens/Documents/CBO manuscript/plots/sprout.response.tiff", width=720, height=900, bg="transparent")
+tiff(filename="C:/Users/dnemens/Dropbox/CBO/plots/sprout.response.tiff", width=720, height=900, bg="transparent")
 
 par(mfrow=c(2,1), 
     oma = c(1.5,.5,.5,1),
@@ -94,17 +97,16 @@ xx <- order(chipr.h)
 y1 <- predict(mod1, data.frame(x=chipr.h), se.fit = TRUE, type="response")
 
 #plot of Basal area vs. chips severity with regression line & confid intervals
-plot(ba.plus~chipr.h, ylab=("Basal area "~ (cm^2/clump)), xlab=" ", pch=19, xlim=c(0, 1010), cex.lab=1.5, cex.axis=1.2)
+plot(BAclump~chipr.h, ylab=("Basal area "~ (cm^2/clump)), xlab=" ", pch=19, xlim=c(0, 1010), cex.lab=1.5, cex.axis=1.2)
 #adds regression line based on prediction from glm model
-#curve(predict(mod1,data.frame(chipr.h=x), type="response"), add=TRUE, lwd=2, col="red")  does same as below
 points(chipr.h[xx], y1$fit[xx], type="l", lwd=2)
 #confidence intervals
 polygon(c(chipr.h[xx], rev(chipr.h[xx])), c(y1$fit[xx]-1.96*y1$se.fit[xx], rev(y1$fit[xx]+1.96*y1$se.fit[xx])), border="black", col=rgb(0,0,0,.2))
 #adds text
-rsq1 <- expression(R^2==0.45)
-text(40, .033, "P<0.0001", cex=1.2)
-text(40, .031, rsq1, cex=1.2)
-text(30, .036, "(a)", cex=1.5)
+rsq1 <- expression(R^2==0.20)
+text(30, 250, "(a)", cex=1.5)
+text(40, 230, "P<0.0001", cex=1.2)
+text(40, 210, rsq1, cex=1.2)
 
 
 #set up for conifedence intervals for height plot
@@ -117,7 +119,7 @@ plot(chip.height~chipr.h, ylab=expression(paste("Maximum sprout height (m)")), x
 points(chipr.h[x1], y3$fit[x1], type="l", lwd=2)
 #points(chipr.h[x1], y3$fit[x1]-1.96*y3$se.fit[x1], type="l", lwd=1, col=2)
 #points(chipr.h[x1], y3$fit[x1]+1.96*y3$se.fit[x1], type="l", lwd=1, col=2)
-polygon(c(chipr.h[x1], rev(chipr.h[x1])), c(y3$fit[x1]-1.96*y3$se.fit[x1], rev(y3$fit[x1]+1.96*y3$se.fit[x1])), border="black", col=rgb(0,0,0,0.15))
+polygon(c(chipr.h[x1], rev(chipr.h[x1])), c(y3$fit[x1]-1.96*y3$se.fit[x1], rev(y3$fit[x1]+1.96*y3$se.fit[x1])), border="black", col=rgb(0,0,0,.2))
 rsq <- expression(R^2==0.29)
 text(30, 3.67, ("P<0.0001"), cex=1.2)
 text(30, 3.41, rsq, cex=1.2)
@@ -149,4 +151,7 @@ chiprdnbr <- (sprout$chips_rdnbr)
 ba <- sprout$BA
 
 plot(ba~chiprdnbr)
+#########################density?###################################
+
+plot(num~chipr.h)
 

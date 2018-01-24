@@ -1,5 +1,5 @@
 sprout <- read.csv("C:/Users/dnemens/Downloads/sprout.response.csv")
-sprout <- read.csv("G:/for R/sprout.response.csv")
+sprout <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sprout.response.csv")
 
 #subset out plots with no storrie sprouts
 sBAkc <- sprout$per.Storrie.sprout.BA.killed.Chips #these plots did not have oaks that sprouted in Storrie
@@ -29,11 +29,12 @@ roc(chipr.skc, logis.skc)
 #Sapling suvival
 #loads center sub-plot data
 center <- read.csv("C:/Users/dnemens/Downloads/center sub plot.csv", header=TRUE)
-center <- read.csv("G:/for R/center sub plot.csv", header = T)
+center <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/center sub plot.csv")
 center[is.na(center)] <-  0 #replaces missing data with 0's
+
 #loads severity file
 rdnbr <- read.csv("C:/Users/dnemens/Downloads/rdnbr.csv",na.strings=c(""))
-rdnbr <- read.csv("G:/for R/rdnbr.csv", header=T)
+rdnbr <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
 rdnbr[is.na(rdnbr)] <-  0 #replaces missing data with 0's
 
 library(dplyr)
@@ -70,7 +71,7 @@ a  <-  ggplot(sprout.log, aes(chipr.skc, logis.skc)) +
   geom_text(x=615, y=.4, angle=90, label = "Moderate")+
   geom_text(x=920, y=.39, angle=90, label = "High") +
   labs(x="Chips fire severity (RdNBR)")+
-  annotate("text", x=875, y=.9, label="a)", size=8)
+  annotate("text", x=875, y=.9, label="a)", size=5)
   
 #plot of chips rdnbr vs. sapling density  
 b <-  ggplot(dat, aes(chips_rdnbr)) +
@@ -91,7 +92,7 @@ b <-  ggplot(dat, aes(chips_rdnbr)) +
     labs(y="Sapling density", x="Chips fire severity (RdNBR)")+
     theme(axis.title = element_text(size=20), axis.text = element_text(size=12, color="black"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=22)))+
     theme(legend.position = c(.09,.85), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
-    annotate("text", x=875, y=13, label="b)", size=8)  
+    annotate("text", x=875, y=13, label="b)", size=5)  
   
 
 library(grid)
