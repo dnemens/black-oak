@@ -5,7 +5,7 @@ abco <- center %>%
   filter(Spp == "ABCO" | Spp == "PSME") %>%
   group_by(ht) %>%
   group_by(plot) %>%
-  summarize(abco.density = length(which(Spp == "ABCO")*63.69), psme.density = length(which(Spp == "PSME")*63.69)
+  summarize(abco.density = length(which(Spp == "ABCO")*63.69), psme.density = length(which(Spp == "PSME")*63.69))
 
 
 
