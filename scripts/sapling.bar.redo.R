@@ -23,14 +23,16 @@ density.m <- midstory %>%
 
 density.m  <-  rename(density.m, plot=Plot, ABCO=abco.density, PSME=psme.density)
 midstory2 <-  merge(density.m, rdnbr, by="plot")
+midstory2 <-  select(midstory2, -storrie_rdnbr|-plot)
 
 
 library(ggplot2)
 
+#plots sapling density for ABCO and 
 ggplot(midstory2, aes(chips_rdnbr))+
-  geom_bar(aes(y=ABCO), stat = "identity", position = "dodge", fill="grey50", color="black", width = 15)+
-  geom_bar(aes(y=PSME), stat = "identity", fill="red", position="dodge", width = 15)+
-  scale_x_continuous(breaks=seq(-500,999,125))+
+  geom_col(aes(y=PSME), fill="red", position=position_dodge(width=5), width = 15)+
+  geom_col(aes(y=ABCO), position = "dodge", fill="grey50", color="black", width = 15)+
+   scale_x_continuous(breaks=seq(-500,999,125))+
   coord_cartesian(xlim=c(-470, 900))+
   scale_y_continuous(limits = c(0,61), expand = c(0, 0))+
   theme_classic()+
@@ -47,23 +49,3 @@ ggplot(midstory2, aes(chips_rdnbr))+
   theme(legend.position = c(.09,.85), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
   annotate("text", x=875, y=55, label="b)", size=5)  
 
-
-ggplot(midstory2, aes(chips_rdnbr)) +
-  scale_x_continuous(breaks=seq(-500,999,125))+
-  coord_cartesian(xlim=c(-470, 900))+
-  scale_y_continuous(limits = c(0,65), expand = c(0, 0)) +
-  theme_classic()+
-  theme (panel.border = element_rect(fill = NA))+
-  geom_vline(xintercept = 69)+
-  geom_vline(xintercept = 315)+
-  geom_vline(xintercept = 641)+
-  geom_text(x=40, y=20, angle=90, label = "Unburned")+
-  geom_text(x=290, y=20, angle=90, label = "Low") +
-  geom_text(x=615, y=20, angle=90, label = "Moderate")+
-  geom_text(x=930, y=20, angle=90, label = "High") +
-  geom_histogram(aes(fill=Spp), colour="black", position = "dodge") +
-  scale_fill_manual(values=c("grey90", "black")) +
-  labs(y="Sapling density", x="Chips fire severity (RdNBR)")+
-  theme(axis.title = element_text(size=20), axis.text = element_text(size=12, color="black"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=22)))+
-  theme(legend.position = c(.09,.85), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
-  annotate("text", x=875, y=60, label="b)", size=5)  
