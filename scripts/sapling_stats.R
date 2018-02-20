@@ -1,8 +1,11 @@
-#extracts summary stats for conifer seedlings and saplings
+#extracts summary stats for conifer & QUKE seedlings and conifer saplings (mean, sd and SE)
 library(tidyr) #for pipe operator?
 library(dplyr)
 
 center <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/center sub plot.csv")
+
+#function for calculating SE
+se <- function(x) sqrt(var(x)/length(x))
 
 #calculates sapling (>50cm) density using center sub-plot data
 density.c <- center %>%
@@ -17,6 +20,8 @@ mean(density.c$den.ha.abco)
 mean(density.c$den.ha.psme)
 sd(density.c$den.ha.abco)
 sd(density.c$den.ha.psme)
+se(density.c$den.ha.abco)
+se(density.c$den.ha.psme)
 
 #calculates sapling frequency using center sub-plot data
 abcos <- density.c$abco.density
@@ -35,14 +40,35 @@ density.c.s <- mutate(density.c.s, den.ha.abco = abco.density*177, den.ha.psme =
 
 mean(density.c.s$den.ha.abco)
 sd(density.c.s$den.ha.abco)
+se(density.c.s$den.ha.abco)
 mean(density.c.s$den.ha.psme)
 sd(density.c.s$den.ha.psme)
+se(density.c.s$den.ha.psme)
 
 #calculates seedling frequency using center sub-plot data
 abcos <- density.c.s$abco.density
 length(abcos[which(abcos>0)])
 psmes <- density.c.s$psme.density
 length(psmes[which(psmes>0)])
+
+#what about oak seedling density?
+density.o <- center %>%
+  filter(Spp == "QUKE") %>%
+  filter(ht<3) %>%
+  group_by(plot) %>%
+  summarize(quke.density = length(which(Spp == "QUKE")))
+
+density.o <- mutate(density.o, den.ha.quke = density.o$quke.density*177)
+
+mean(density.o$den.ha.quke)
+sd(density.o$den.ha.quke)
+se(density.o$den.ha.quke)
+
+#frequency = 27 plots
+
+#calculates regen counts per ht class
+
+
 
 ###################same as above with focal oak midstory data#######################
 midstory <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/midstory.csv")
@@ -90,5 +116,11 @@ length(abcos[which(abcos>0)])
 psmes <- density.m.s$psme.density
 length(psmes[which(psmes>0)])
 
+#quke seedlings using focal oak midstory data#########################
+density.o.m <- midstory %>%
+  filter(spp == "QUKE") %>%
+  filter(tree.ht.class<3) %>%
+  group_by(Plot) %>%
+  summarize(quke.density = sum((tree.num)[which(spp == "QUKE")]))
 
-
+density.o.m <- mutate(density.o.m, den.ha.quke = density.o.m$quke.density*63.69)
