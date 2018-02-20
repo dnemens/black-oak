@@ -58,12 +58,11 @@ quke.S <- sprout4 %>%
 #should I filter out the 0's?  probably...
 
 #for Chips sprouts
+quke.C <- sprout4 %>%
+  filter(stems.C>0) %>%
+  summarise(mean.C = mean(sph.C), sd.C = sd(sph.C), se.C=se(sph.C))
 
-mean.C = mean(sph.C), sd.C = sd(sph.C), se.C=se(sph.C))
-
-
-
-
+########################################################################################
 #caluculates a stems/ha for each Storrie severity category (1-4)
 library(tidyr)
 #re-creates Storrie and Chips severity category columns
