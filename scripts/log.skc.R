@@ -1,4 +1,4 @@
-sprout <- read.csv("C:/Users/dnemens/Downloads/sprout.response.csv")
+#makes plots comparing mortality of Storrie sprouts and conifer saplings in Chips Fire
 sprout <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sprout.response.csv")
 
 #subset out plots with no storrie sprouts
