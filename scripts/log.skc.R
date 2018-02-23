@@ -89,7 +89,7 @@ b <-  ggplot(dat, aes(chips_rdnbr)) +
     geom_text(x=930, y=8, angle=90, label = "High") +
     geom_histogram(aes(fill=Spp), colour="black", position = "dodge") +
     scale_fill_manual(values=c("grey90", "black")) +
-    labs(y="Sapling density", x="Chips fire severity (RdNBR)")+
+    labs(y="Sapling count (per plot)", x="Chips fire severity (RdNBR)")+
     theme(axis.title = element_text(size=20), axis.text = element_text(size=12, color="black"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=22)))+
     theme(legend.position = c(.09,.85), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
     annotate("text", x=875, y=13, label="b)", size=5)  
