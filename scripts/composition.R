@@ -1,14 +1,13 @@
-library(plyr)
-library(dplyr)
-library(tidyr)
+
+library(tidyverse)
 library(ggplot2)
 library (rcompanion)
 library(MASS)
 ############################################################
 #re-do using R to come up with #'s
-comp <- read.csv("D:/for R/overstory.raw.csv")
-comp <- read.csv("~/DEFENSE/analyses/overstory.raw.csv")
-rdnbr <- read.csv("D:/for R/rdnbr.csv")
+comp <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.csv")
+#comp <- read.csv("D:/for R/overstory.raw.csv")
+rdnbr <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
 
 #calculates number of living pre-chips firs
 pre.firs <- comp %>%
@@ -105,7 +104,7 @@ ggplot(dom.df, aes(chiprdnbr)) +
   labs(x="Chips Fire Severity (RdNBR)", y="Change in relative dominance (%)") + 
   ylim(-100, 100) +
   geom_text(x=-400, y=100, label="Black oak", cex=6, color="black", fontface="italic") +
-  geom_text(x=-290, y=-90, label="White fir + Douglas fir", cex=6, color="black", fontface="italic") +
+  geom_text(x=-290, y=-90, label="White fir + Douglas-fir", cex=6, color="black", fontface="italic") +
   geom_text(x=-400, y=90, label="R^2==0.43", parse=T, cex=5) + 
   geom_text(x=-400, y=-100, label="R^2==0.43", parse=T, cex=5) 
 
