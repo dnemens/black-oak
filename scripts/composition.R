@@ -1,3 +1,4 @@
+#conducts analysis and creates graph of compositional change in conifer and oak along Chips severity gradient
 
 library(tidyverse)
 library(ggplot2)
@@ -90,14 +91,14 @@ qukechange <- dom.df$qukec
 
 #graphs the resulting points on the same graph
 ggplot(dom.df, aes(chiprdnbr)) + 
-  geom_point(aes(y=conchange), size=4, shape=17, color="black") + 
-  geom_point(aes(y=qukechange), size=4, shape=1, color="black") + 
+  geom_point(aes(y=conchange), shape=17, size=4) + 
+  geom_point(aes(y=qukechange), size=4, shape=1) + 
   geom_smooth (aes(y=conchange), span=2, color="black") + 
   geom_smooth (aes(y=qukechange), span=2, color="black") + 
   #geom_smooth (aes(y=qukechange+12), method="glm", method.args = list(family="Gamma"), colour = "blue", fullrange = TRUE) +
   #geom_smooth (aes(y=conchange), method="glm", formula = y~I(x^2), colour = "red", fullrange = TRUE) +
-    theme(legend.title=element_blank()) +  
-  theme_classic()+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   theme(axis.title=element_text(size=20))+
   theme(axis.text = element_text(size=12))+
   geom_hline(aes(yintercept=0), colour="black")+
@@ -108,6 +109,10 @@ ggplot(dom.df, aes(chiprdnbr)) +
   geom_text(x=-400, y=90, label="R^2==0.43", parse=T, cex=5) + 
   geom_text(x=-400, y=-100, label="R^2==0.43", parse=T, cex=5) 
 
+setwd("C:/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave("composition.png")
+
+####################################################################################
 #regular r plot with regression lines and conidence intervals
 plot(qukechange~chiprdnbr, pch=20, col="black", cex=1.4, ylim=c(-103, 103))
 points(conchange~chiprdnbr, pch=5)

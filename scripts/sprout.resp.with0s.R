@@ -5,7 +5,7 @@
 sprout <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sprout.response.csv")
 
 #loads nesessary packages
-library(dplyr)
+library(tidyverse)
 library(MASS)
 library(rcompanion)
 
@@ -37,6 +37,15 @@ summary(mod)
 #diagnostics
 rmse(mod$residuals)
 nagelkerke(mod)
+
+#gam??
+library(mgcv)
+mod.gam <- gam((BAclump+.01) ~ s(chiprdnbr, bs="cs", k=3), family=Gamma(link="log"))
+rmse(mod.gam$residuals)
+summary (mod.gam) 
+gam.check(mod.gam)
+
+y2=predict(mod.gam, data.frame(x=chiprdnbr), se.fit = TRUE, type="response")
 
 
 ######################################################################
@@ -98,3 +107,4 @@ text(-420, 3.41, rsq, cex=1.2)
 text(-420, 4, "(b)", cex=1.5)
 
 dev.off()
+

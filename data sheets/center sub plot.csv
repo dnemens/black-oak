@@ -1989,7 +1989,6 @@ plot,Spp,dist,azim,ht,crown w1,crown w2,crown area,herb cover,# planted
 3.4.1,CECO,4,294,2,90,80,7225,,
 3.4.1,gram,,,,,,0,0,
 3.4.1,forb,,,,,,0,2,
-3.4.1,ABCO,,,,,,0,,4
 3.4.2,CEIN,1.6,135,4,160,190,30625,,
 3.4.2,CEIN,4,135,3,70,80,5625,,
 3.4.2,CEIN,3.4,170,3,50,80,4225,,
@@ -2616,6 +2615,5 @@ plot,Spp,dist,azim,ht,crown w1,crown w2,crown area,herb cover,# planted
 4.4.6,CECO,3.8,139,2,105,90,9506.25,,
 4.4.6,CECO,3.4,152,2,105,80,8556.25,,
 4.4.6,ARPA,3.8,160,3,65,90,6006.25,,
-4.4.6,PSME,,,,,,0,,2
 4.4.6,gram,,,,,,0,1,
 4.4.6,forb,,,,,,0,0,

@@ -1,13 +1,11 @@
 #extracts summary stats for conifer & QUKE seedlings and conifer saplings (mean, sd and SE)
-library(tidyr) #for pipe operator?
-library(dplyr)
-
+library(tidyverse)
 center <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/center sub plot.csv")
 
 #function for calculating SE
 se <- function(x) sqrt(var(x)/length(x))
 
-#calculates sapling (>50cm) density using center sub-plot data
+#calculates sapling (>50cm = ht class 4&5) density using center sub-plot data
 density.c <- center %>%
   filter(Spp == "ABCO" | Spp == "PSME") %>%
   filter(ht>=3) %>%
@@ -23,7 +21,7 @@ sd(density.c$den.ha.psme)
 se(density.c$den.ha.abco)
 se(density.c$den.ha.psme)
 
-#calculates sapling frequency using center sub-plot data
+#calculates sapling (>50cm = ht class 1-3) frequency using center sub-plot data
 abcos <- density.c$abco.density
 length(abcos[which(abcos>0)])
 psmes <- density.c$psme.density
