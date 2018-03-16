@@ -1,7 +1,6 @@
 #conducts analysis and creates graph of compositional change in conifer and oak along Chips severity gradient
 
 library(tidyverse)
-library(ggplot2)
 library (rcompanion)
 library(MASS)
 ############################################################
@@ -91,26 +90,28 @@ qukechange <- dom.df$qukec
 
 #graphs the resulting points on the same graph
 ggplot(dom.df, aes(chiprdnbr)) + 
-  geom_point(aes(y=conchange), shape=17, size=4) + 
-  geom_point(aes(y=qukechange), size=4, shape=1) + 
+  geom_point(aes(y=conchange), shape=17, size=3) + 
+  geom_point(aes(y=qukechange), size=3, shape=1) + 
   geom_smooth (aes(y=conchange), span=2, color="black") + 
+  #geom_smooth (aes(y=(conchange+85)), method="glm", method.args = list(family=Gamma(link="log")), 
+  #             colour = "black", fullrange = TRUE) +
   geom_smooth (aes(y=qukechange), span=2, color="black") + 
-  #geom_smooth (aes(y=qukechange+12), method="glm", method.args = list(family="Gamma"), colour = "blue", fullrange = TRUE) +
-  #geom_smooth (aes(y=conchange), method="glm", formula = y~I(x^2), colour = "red", fullrange = TRUE) +
+  #geom_smooth (aes(y=qukechange+12), method="glm", method.args = list(family=Gamma(link="log")), 
+  #       colour = "black", fullrange = TRUE) +
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  theme(axis.title=element_text(size=20))+
+  theme(axis.title=element_text(size=22, family="serif"))+
   theme(axis.text = element_text(size=12))+
+  theme(axis.title.x = element_text(margin=margin(t=20)))+
   geom_hline(aes(yintercept=0), colour="black")+
   labs(x="Chips Fire Severity (RdNBR)", y="Change in relative dominance (%)") + 
-  ylim(-100, 100) +
-  geom_text(x=-400, y=100, label="Black oak", cex=6, color="black", fontface="italic") +
-  geom_text(x=-290, y=-90, label="White fir + Douglas-fir", cex=6, color="black", fontface="italic") +
-  geom_text(x=-400, y=90, label="R^2==0.43", parse=T, cex=5) + 
-  geom_text(x=-400, y=-100, label="R^2==0.43", parse=T, cex=5) 
+  geom_text(x=-465, y=100, label="Black oak", cex=6, color="black", fontface="italic", family="serif", hjust=0) +
+  geom_text(x=-465, y=-85, label="White fir + Douglas-fir", cex=6, color="black", fontface="italic", family="serif", hjust=0) +
+  geom_text(x=-480, y=85, label="R^2==0.43", parse=T, cex=5, family="serif", hjust=0) + 
+  geom_text(x=-480, y=-100, label="R^2==0.43", parse=T, cex=5, family="serif", hjust=0) 
 
 setwd("C:/Users/dnemens/Dropbox/CBO/black-oak/plots")
-ggsave("composition.png")
+ggsave("composition.tiff", width=22, height=15, units="cm", device="tiff")
 
 ####################################################################################
 #regular r plot with regression lines and conidence intervals

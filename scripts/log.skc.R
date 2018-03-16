@@ -28,12 +28,10 @@ roc(chipr.skc, logis.skc)
 #################################################################
 #Sapling suvival
 #loads center sub-plot data
-center <- read.csv("C:/Users/dnemens/Downloads/center sub plot.csv", header=TRUE)
 center <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/center sub plot.csv")
 center[is.na(center)] <-  0 #replaces missing data with 0's
 
 #loads severity file
-rdnbr <- read.csv("C:/Users/dnemens/Downloads/rdnbr.csv",na.strings=c(""))
 rdnbr <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
 rdnbr[is.na(rdnbr)] <-  0 #replaces missing data with 0's
 
@@ -45,8 +43,7 @@ sap.sub <- filter(sap, ht>=3, Spp=="ABCO"|Spp=="PSME")
 write.csv (sap.sub, "C:/Users/dnemens/Downloads/sapling3.csv")
 #################################################################
 #prepped for ggplot
-dat <- read.csv("C:/Users/dnemens/Downloads/sapling3.csv", header = T)
-dat <- read.csv("~/Grad School/LASSEN PROJECT/for R/sapling3.csv", header=T)
+dat <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sapling3.csv", header = T)
 Spp <- dat$Spp
 
 library(ggplot2)
@@ -64,37 +61,36 @@ a  <-  ggplot(sprout.log, aes(chipr.skc, logis.skc)) +
   theme (panel.border = element_rect(fill = NA))+
   geom_point (aes(y=logis.skc), size=4) +
   labs(y="Sprout clump status", x=element_blank()) + 
-  geom_text(x=-400, y=1, label="P<0.0001", cex=4.5, colour="black") +
-  theme(axis.title = element_text(size=20), axis.text = element_text(size=12, colour = "black"))+
-  geom_text(x=40, y=.4, angle=90, label = "Unburned")+
-  geom_text(x=285, y=.39, angle=90, label = "Low") +
-  geom_text(x=615, y=.4, angle=90, label = "Moderate")+
-  geom_text(x=920, y=.39, angle=90, label = "High") +
-  labs(x="Chips fire severity (RdNBR)")+
-  annotate("text", x=875, y=.9, label="a)", size=5)
+  theme(axis.title = element_text(size=20, family = "serif"), axis.text = element_text(size=12, family = "serif"))+
+  geom_text(x=40, y=.4, angle=90, label = "Unburned", family="serif")+
+  geom_text(x=285, y=.39, angle=90, label = "Low", family="serif") +
+  geom_text(x=615, y=.4, angle=90, label = "Moderate", family="serif")+
+  geom_text(x=935, y=.39, angle=90, label = "High", family="serif") +
+  labs(x="Chips fire severity (RdNBR)", family="serif")+
+  annotate("text", x=-495, y=.97, label="(a)", size=5, family="serif", fontface="bold", hjust=0)+
+  annotate("text", x=-495, y=.89, label="P<0.0001", cex=4.5, colour="black", family="serif", hjust=0) 
   
 #plot of chips rdnbr vs. sapling density  
-b <-  ggplot(dat, aes(chips_rdnbr)) +
+b <-  ggplot(sap.sub, aes(chips_rdnbr)) +
+    geom_histogram(aes(fill=Spp), colour="black", position = "dodge") +
     scale_x_continuous(breaks=seq(-500,999,125))+
-    coord_cartesian(xlim=c(-470, 900))+
+    coord_cartesian(xlim=c(-500, 900))+
     scale_y_continuous(limits = c(0,15.2), expand = c(0, 0)) +
     theme_classic()+
     theme (panel.border = element_rect(fill = NA))+
     geom_vline(xintercept = 69)+
     geom_vline(xintercept = 315)+
     geom_vline(xintercept = 641)+
-    geom_text(x=40, y=8, angle=90, label = "Unburned")+
-    geom_text(x=290, y=8, angle=90, label = "Low") +
-    geom_text(x=615, y=8, angle=90, label = "Moderate")+
-    geom_text(x=930, y=8, angle=90, label = "High") +
-    geom_histogram(aes(fill=Spp), colour="black", position = "dodge") +
+    geom_text(x=40, y=8, angle=90, label = "Unburned", family="serif")+
+    geom_text(x=285, y=8, angle=90, label = "Low", family="serif") +
+    geom_text(x=615, y=8, angle=90, label = "Moderate", family="serif")+
+    geom_text(x=935, y=8, angle=90, label = "High", family="serif") +
     scale_fill_manual(values=c("grey90", "black")) +
-    labs(y="Sapling count (per plot)", x="Chips fire severity (RdNBR)")+
-    theme(axis.title = element_text(size=20), axis.text = element_text(size=12, color="black"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=22)))+
-    theme(legend.position = c(.09,.85), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
-    annotate("text", x=875, y=13, label="b)", size=5)  
+    labs(y="Sapling count (per plot)", x="Chips Fire severity (RdNBR)")+
+    theme(axis.title = element_text(size=20, family="serif"), axis.text = element_text(size=12, color="black", family="serif"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=20)))+
+    theme(legend.position = c(.1, .8), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
+    annotate("text", x=-495, y=14, label="(b)", size=5, family="serif", fontface="bold", hjust=0)  
   
-
 library(grid)
 library(gridExtra)
   
@@ -105,7 +101,10 @@ b$widths[2:3] <- maxWidth
 a$widths[2:3] <- maxWidth
 
 #stack both ggplots
-grid.arrange(a, b, nrow=2, ncol=1)
+c <- grid.arrange(a, b, nrow=2, ncol=1)
+
+setwd("C:/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave(plot=c, "skc_saplings.tiff", width=20, height=25, units="cm", device = "tiff")
 
 ##extra code#############
 #gA <- ggplotGrob(a)
