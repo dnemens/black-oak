@@ -34,17 +34,13 @@ rmse <- function(pred, obs) {sqrt(mean((pred-obs)^2))}
 #gamma dist glm for chips sprout BA
 mod <- glm ((BAclump+1)~chiprdnbr, family=Gamma(link="log"), control = list(maxit = 100))
 summary(mod)
-#diagnostics
-pred1 <- predict(mod, type="response")
-obs1 <- BAclump+1
-rmse(pred=pred1, obs=obs1)
-nagelkerke(mod)
 
-#model diagnostics
+#glm diagnostics
 pred1 <- predict(mod, type="response")
 obs1 <- BAclump+1
 rmse(pred=pred1, obs=obs1)
-nagelkerke(modg)
+#how much deviance explained? 
+1-(modg$deviance/modg$null)
 
 #gam with Gamma dist
 library(mgcv)
@@ -55,8 +51,13 @@ summary (modg)
 gam.check(modg)
 predg <- predict(modg, type="response")
 obsg <- BAclump+1
-AIC(modg)
 rmse(pred=predg, obs=obsg)
+#how much deviance explained? 
+1-(modg$deviance/modg$null)
+
+#compare glm to gam with Chi-squared test
+anova(mod, modg, test = "F")
+AIC(mod, modg)
 
 #prep for r plot
 xx <- order(chiprdnbr)
@@ -78,7 +79,6 @@ summary (mod2)
 pred2 <- predict(mod2, type="response")
 obs2 <- height+1
 rmse(pred=pred2, obs=obs2)
-nagelkerke(mod2)
 
 #gam
 mod2g <- gam((height+1) ~ s(chiprdnbr, bs="tp", k=5), family=Gamma(link="log"))
@@ -87,6 +87,10 @@ gam.check(mod2g)
 pred2g <- predict(mod2g, type="response")
 obs2g <- height+1
 rmse(pred=pred2g, obs=obs2g)
+
+#compare glm to gam
+anova(mod2, mod2g, test = "F")
+AIC(mod2, mod2g)
 
 ##############################################
 #same with ggplot to check confidence intervals####
