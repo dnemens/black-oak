@@ -91,24 +91,24 @@ qukechange <- dom.df$qukec
 #graphs the resulting points on the same graph
 ggplot(dom.df, aes(chiprdnbr)) + 
   geom_point(aes(y=conchange), shape=17, size=3) + 
-  geom_point(aes(y=qukechange), size=3, shape=1) + 
+  geom_point(aes(y=qukechange+12), size=3, shape=1) + 
   geom_smooth (aes(y=conchange), span=2, color="black") + 
   #geom_smooth (aes(y=(conchange+85)), method="glm", method.args = list(family=Gamma(link="log")), 
   #             colour = "black", fullrange = TRUE) +
   geom_smooth (aes(y=qukechange), span=2, color="black") + 
   #geom_smooth (aes(y=qukechange+12), method="glm", method.args = list(family=Gamma(link="log")), 
-  #       colour = "black", fullrange = TRUE) +
+  #       colour = "red", fullrange = TRUE) +
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-  theme(axis.title=element_text(size=22, family="serif"))+
+  theme(axis.title=element_text(size=20, family="serif"))+
   theme(axis.text = element_text(size=12))+
   theme(axis.title.x = element_text(margin=margin(t=20)))+
   geom_hline(aes(yintercept=0), colour="black")+
   labs(x="Chips Fire Severity (RdNBR)", y="Change in relative dominance (%)") + 
   geom_text(x=-465, y=100, label="Black oak", cex=6, color="black", fontface="italic", family="serif", hjust=0) +
-  geom_text(x=-465, y=-85, label="White fir + Douglas-fir", cex=6, color="black", fontface="italic", family="serif", hjust=0) +
-  geom_text(x=-480, y=85, label="R^2==0.43", parse=T, cex=5, family="serif", hjust=0) + 
-  geom_text(x=-480, y=-100, label="R^2==0.43", parse=T, cex=5, family="serif", hjust=0) 
+  geom_text(x=-465, y=-100, label="White fir + Douglas-fir", cex=6, color="black", fontface="italic", family="serif", hjust=0) 
+  #geom_text(x=-480, y=85, label="R^2==0.59", parse=T, cex=5, family="serif", hjust=0) + 
+  #geom_text(x=-480, y=-100, label="R^2==0.59", parse=T, cex=5, family="serif", hjust=0) 
 
 setwd("C:/Users/dnemens/Dropbox/CBO/black-oak/plots")
 ggsave("composition.tiff", width=22, height=15, units="cm", device="tiff")
@@ -130,9 +130,10 @@ points(chiprdnbr[xx], y2$fit[xx]+12, type="l", lwd=3, col="black")
 polygon(c(chiprdnbr[xx], rev(chiprdnbr[xx])), c((y1$fit[xx]-1.96*y1$se.fit[xx])-12, (rev(y1$fit[xx]+1.96*y1$se.fit[xx])))+12, border="black", col=rgb(0,0,0,0.15))
 polygon(c(chiprdnbr[xx], rev(chiprdnbr[xx])), c(y2$fit[xx]-1.96*y2$se.fit[xx], rev(y2$fit[xx]+1.96*y2$se.fit[xx])), border="black", col=rgb(0,0,0,0.15))
 
-
+#######################################################################################
 #stats for each line
-rmse <- function(x) {sqrt(mean(x^2))}
+#funtion for root mean square error
+rmse <- function(pred, obs) {sqrt(mean((pred-obs)^2))}
 
 #trying linear model
 mod1 <- quke.lm <- lm(qukechange+12~chiprdnbr) #r2=.5635, pval<.0001
@@ -144,38 +145,39 @@ rmse(mod1$residuals) #18.2
 library(MASS)
 boxcox(lm((qukechange+12)~chiprdnbr))
 
-#trying adding square term to model given results of boxcox
-mod2 <- lm(qukechange-12~I(chiprdnbr^2)+chiprdnbr)
+#linear model with square term (given results of boxcox)
+mod2 <- lm(qukechange+12~I(chiprdnbr^2)+chiprdnbr)
 summary(mod2)
+
+#mod2 diagnostics
 AIC(mod2) #632.37
-rmse(mod2$residuals) #17.41
-plot(mod2)
-nagelkerke(mod2) #loglik =  -32.321
+pred2 <- predict(mod2, type="response")
+obs2 <- qukechange+12
+rmse(pred=pred2, obs=obs2) #17.4
+plot(mod2) 
+nagelkerke(mod2) #loglik =  -34.321 cox&snell 0.6
 
-#models conifer change in dominance
-mod3 <- lm(conchange-12~I(chiprdnbr^2)+chiprdnbr)
-
+###@#this turned out best of three
 #model using Gamma distribution 
 quke.glm <- glm((qukechange+12)~chiprdnbr, family = Gamma(link="log"))
-summary (quke.glm) #AIC 606
-rmse(quke.glm$residuals) #.02
+summary (quke.glm) 
+
+#diagnostics
+AIC(quke.glm) #AIC 597
+predg <- predict(quke.glm, type="response")
+obsg <- qukechange+12
+rmse(pred=predg, obs=obsg) #17.8
 plot (quke.glm)
-nagelkerke(quke.glm) #loglik = -27.327
-
-#how about a log transformation?
-mod3 <- lm((sqrt(qukechange+12))~chiprdnbr)
-summary(mod2)
-AIC(mod2) #632
-rmse(mod2$residuals) #17.4
-plot(mod2)
+nagelkerke(quke.glm) #loglik = -32.358, cox&snell 0.59
 
 
+#gam?
+library(mgcv)
+mod.gam <- gam((qukechange+12) ~ s(chiprdnbr, bs="tp", k=3), family=Gamma(link="log"))
+summary (mod.gam)
 
-
-con.lm <- lm((conchange)~chiprdnbr) #r2=.5028, pval<.0001
-summary(con.lm)
-plot (conchange~chiprdnbr)
-
-con.glm <- glm((conchange+85)~chiprdnbr, family=Gamma)
-summary(con.glm)
-nagelkerke(quke.glm.p)
+gam.check(mod.gam)
+AIC(mod2, quke.glm, mod.gam)
+predgam <- predict(mod.gam, type="response")
+obsgam <- qukechange+12
+rmse(pred=predgam, obs=obsgam) #17.9

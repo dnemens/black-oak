@@ -93,7 +93,8 @@ anova(mod2, mod2g, test = "F")
 AIC(mod2, mod2g)
 
 ##############################################
-#same with ggplot to check confidence intervals####
+#plot with ggplot####
+library(ggplot2)
 
 #data frame for ggplot
 
@@ -103,8 +104,8 @@ dat <- data.frame(chiprdnbr, BAclump, height)
 a <- ggplot(dat, aes(chiprdnbr)) + 
   geom_point(aes(y=BAclump)) + 
   stat_smooth ((aes(y=BAclump+1)), method="gam", formula = y~s(x, bs="tp", k=7), se=T, 
-  #             method.args = list(family=Gamma(link="log")), colour = "black", fullrange=T) + 
-               colour = "black", fullrange=T) + 
+          method.args = list(family=Gamma(link="log")), colour = "black", fullrange=T) + 
+  #             colour = "black", fullrange=T) + 
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   theme(axis.title=element_text(size=20, family="serif"))+
@@ -112,9 +113,9 @@ a <- ggplot(dat, aes(chiprdnbr)) +
   theme(axis.title.y = element_text(margin = margin(l=-4, r=12)))+
   labs(x="", y=expression(paste(text="Basal area (cm"^{2}*")"))) + 
   coord_cartesian(ylim = c(0, 300))+
-  annotate("text", x=-465, y=290, label="(a)", size=5, family="serif", fontface="bold")+
-  annotate("text", x=-394, y=267, label="P < 0.0001", size=5, family="serif")+
-  annotate("text", x=-415, y=245, label="r^2==0.44", size=5, parse=T, family="serif")
+  annotate("text", x=-465, y=290, label="(a)", size=5, family="serif", fontface="bold")
+  #annotate("text", x=-394, y=267, label="P < 0.0001", size=5, family="serif")
+  #annotate("text", x=-415, y=245, label="r^2==0.44", size=5, parse=T, family="serif")
 
 #plot of height
 b <- ggplot(dat, aes(chiprdnbr)) + 
@@ -130,11 +131,13 @@ b <- ggplot(dat, aes(chiprdnbr)) +
   theme(axis.title=element_text(size=20, family="serif"))+
   theme(axis.text = element_text(size=12, family="serif"))+
   labs(x="Chips Fire Severity (RdNBR)", y="Height (m)") + 
-  annotate("text", x=-465, y=5.9, label="(b)", size=5, family="serif", fontface="bold")+
-  annotate("text", x=-394, y=5.5, label="P < 0.0001", size=5, family="serif")+
-  annotate("text", x=-415, y=5.15, label="r^2==0.62", size=5, parse=T, family="serif")
+  annotate("text", x=-465, y=5.9, label="(b)", size=5, family="serif", fontface="bold")
+  #annotate("text", x=-394, y=5.5, label="P < 0.0001", size=5, family="serif")
+  #annotate("text", x=-415, y=5.15, label="r^2==0.62", size=5, parse=T, family="serif")
 
 #creates uniform widths for plots
+library(gridExtra)
+library(grid)
 a <- ggplot_gtable(ggplot_build(a))
 maxWidth = unit.pmax(b$widths[2:3], a$widths[2:3])
 b$widths[2:3] <- maxWidth
@@ -144,7 +147,7 @@ a$widths[2:3] <- maxWidth
 c <- grid.arrange(a, b, nrow=2, ncol=1)
 
 setwd("C:/Users/dnemens/Dropbox/CBO/black-oak/plots")
-ggsave(plot=c, "sprout.metrics.loess.tiff", width=20, height=25, units="cm", device = "tiff")
+ggsave(plot=c, "sprout.metrics.gam.tiff", width=20, height=25, units="cm", device = "tiff")
 
 
 #######################################################################
