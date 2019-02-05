@@ -61,7 +61,7 @@ a  <-  ggplot(sprout.log, aes(chipr.skc, logis.skc)) +
   theme (panel.border = element_rect(fill = NA))+
   geom_point (aes(y=logis.skc), size=4) +
   labs(y="Sprout clump status", x=element_blank()) + 
-  theme(axis.title = element_text(size=20, family = "serif"), axis.text = element_text(size=12, family = "serif"))+
+  theme(axis.title = element_text(size=20, family = "serif"), axis.text = element_text(size=15, family = "serif"))+
   geom_text(x=40, y=.4, angle=90, label = "Unburned", family="serif")+
   geom_text(x=285, y=.39, angle=90, label = "Low", family="serif") +
   geom_text(x=615, y=.4, angle=90, label = "Moderate", family="serif")+
@@ -87,7 +87,7 @@ b <-  ggplot(sap.sub, aes(chips_rdnbr)) +
     geom_text(x=935, y=8, angle=90, label = "High", family="serif") +
     scale_fill_manual(values=c("grey90", "black")) +
     labs(y="Sapling count (per plot)", x="Chips Fire severity (RdNBR)")+
-    theme(axis.title = element_text(size=20, family="serif"), axis.text = element_text(size=12, color="black", family="serif"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=20)))+
+    theme(axis.title = element_text(size=20, family="serif"), axis.text = element_text(size=15, color="black", family="serif"), axis.title.x = element_text(margin=margin(t=18)), axis.title.y = element_text(margin=margin(r=20)))+
     theme(legend.position = c(.1, .8), legend.title = element_blank(), legend.text = element_text(size=12), legend.background = element_blank())+
     annotate("text", x=-495, y=14, label="(b)", size=5, family="serif", fontface="bold", hjust=0)  
   

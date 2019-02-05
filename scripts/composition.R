@@ -155,9 +155,9 @@ pred2 <- predict(mod2, type="response")
 obs2 <- qukechange+12
 rmse(pred=pred2, obs=obs2) #17.4
 plot(mod2) 
-nagelkerke(mod2) #loglik =  -34.321 cox&snell 0.6
+nagelkerke(mod2) #loglik =  -34.321 cox&snell 0.6 -- crap?
 
-###@#this turned out best of three
+###@#this turned out best of three using AIC
 #model using Gamma distribution 
 quke.glm <- glm((qukechange+12)~chiprdnbr, family = Gamma(link="log"))
 summary (quke.glm) 
@@ -168,8 +168,9 @@ predg <- predict(quke.glm, type="response")
 obsg <- qukechange+12
 rmse(pred=predg, obs=obsg) #17.8
 plot (quke.glm)
-nagelkerke(quke.glm) #loglik = -32.358, cox&snell 0.59
-
+nagelkerke(quke.glm) #loglik = -32.358, cox&snell 0.59 -- this is prob crap
+library(modEvA)
+Dsquared(quke.glm, adjust = T)
 
 #gam?
 library(mgcv)

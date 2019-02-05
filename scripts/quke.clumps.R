@@ -1,19 +1,35 @@
 #summary stats of basal area and sprouts per clump, plot and ha
 
 comp <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.csv")
+comp[is.na(comp)] <- 0
 rdnbr <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
+#loads csv of sprout response data 
+sprout <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/focaloak.csv")
+sprout[is.na(sprout)] <- 0
 
 library(dplyr)
 
 
 #filters out live QUKE clumps, and counts clumps per plot
-qukes <- comp %>%
-  filter(Spp == "QUKE") %>%
+qukes2 <- comp %>%
+  filter(Spp == "QUKE"& snag.class!= "STUMP") %>%
   group_by(plot) %>%
-  filter(snag_stump..diam==0) %>%
+  filter(dbh==0) %>%
   summarize(clumps = n()) 
-  
 
+sprouts <- sprout %>%
+  group_by(plot) %>%
+  summarise(diam.storrie.live = sum(storrie.live), diam.storrie.dead = (sum(storrie.dead)), diam.chips = sum(chips.live))
+
+#merges both df's keeping plots with no clumps
+qukes2 <- merge(qukes2, sprouts, by="plot", all.y = T)
+
+qukes2[is.na(qukes2)] <- 0 #replaces na's with 0
+  
+#creates csv of sprout clump data
+write.csv(qukes2, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/quke.clumps.csv", row.names = F)
+
+###################
 #calculates extrapolated clumps/ha for each plot
 quke.clumps <- mutate (qukes, clumps.ha=clumps*22.2222)
 

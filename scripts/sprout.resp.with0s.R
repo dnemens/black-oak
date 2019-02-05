@@ -40,7 +40,7 @@ pred1 <- predict(mod, type="response")
 obs1 <- BAclump+1
 rmse(pred=pred1, obs=obs1)
 #how much deviance explained? 
-1-(modg$deviance/modg$null)
+((mod$null-mod$deviance)/mod$null)*100
 
 #gam with Gamma dist
 library(mgcv)
@@ -53,7 +53,7 @@ predg <- predict(modg, type="response")
 obsg <- BAclump+1
 rmse(pred=predg, obs=obsg)
 #how much deviance explained? 
-1-(modg$deviance/modg$null)
+((modg$null-modg$deviance)/modg$null)*100  
 
 #compare glm to gam with Chi-squared test
 anova(mod, modg, test = "F")
@@ -94,10 +94,8 @@ AIC(mod2, mod2g)
 
 ##############################################
 #plot with ggplot####
-library(ggplot2)
 
 #data frame for ggplot
-
 dat <- data.frame(chiprdnbr, BAclump, height)
 
 #plot of basal area 
@@ -109,7 +107,7 @@ a <- ggplot(dat, aes(chiprdnbr)) +
   theme_bw()+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   theme(axis.title=element_text(size=20, family="serif"))+
-  theme(axis.text = element_text(size=12, family="serif"))+
+  theme(axis.text = element_text(size=15, family="serif"))+
   theme(axis.title.y = element_text(margin = margin(l=-4, r=12)))+
   labs(x="", y=expression(paste(text="Basal area (cm"^{2}*")"))) + 
   coord_cartesian(ylim = c(0, 300))+
@@ -129,7 +127,7 @@ b <- ggplot(dat, aes(chiprdnbr)) +
   theme(axis.text.y = element_text(margin = margin(l=25)))+
   theme(axis.title.x = element_text(margin=margin(t=20)))+
   theme(axis.title=element_text(size=20, family="serif"))+
-  theme(axis.text = element_text(size=12, family="serif"))+
+  theme(axis.text = element_text(size=15, family="serif"))+
   labs(x="Chips Fire Severity (RdNBR)", y="Height (m)") + 
   annotate("text", x=-465, y=5.9, label="(b)", size=5, family="serif", fontface="bold")
   #annotate("text", x=-394, y=5.5, label="P < 0.0001", size=5, family="serif")
