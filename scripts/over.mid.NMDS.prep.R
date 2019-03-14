@@ -209,7 +209,7 @@ Spp <-
   coord_cartesian(xlim = c(-1.6,1.1), ylim = c(-1.5,1.5))+
   scale_color_manual(values = c("red", "blue"), labels = c("Fire Sensitive", "Fire Tolerant"))+
   annotate(geom = "text", -1.5, .2, label ="Mixed-\nconifer \nForest", colour = "green4", size = 5, fontface = "bold")+
-  #annotate(geom = "text", -0.25, -1.3, label ="Mixed-\nconifer \nRegeneration", colour = "green4", size = 5, fontface = "bold")+
+  annotate(geom = "text", 1.1, 1.5, label ="c)", size = 4, fontface = "bold")+
   annotate(geom = "text", 1, .2, label ="Oak-\nshrub", colour = "green4", size = 5, fontface = "bold")
 
 # Create a text grob <- grobTree(textGrob("Scatter plot", x=0.1,  y=0.95, hjust=0, gp=gpar(col="red", fontsize=13, fontface="italic")))
@@ -221,10 +221,10 @@ S <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   coord_cartesian(xlim = c(-1.6,1.1), ylim = c(-1.5,1.5))+
   stat_contour(data = Sordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
-  labs(colour="Fire severity\n(RdNBR)", title= expression("Storrie Fire (r"^"2"*"=0.32)"))+
+  #labs(colour="Fire severity\n(RdNBR)", title= expression("Storrie Fire (r"^"2"*"=0.32)"))+
   theme(plot.title = element_text(hjust=.5, size=15))+
   annotate(geom = "text", -1.5, .2, label ="Mixed-\nconifer \nForest", colour = "green4", size = 5, fontface = "bold")+
-  #annotate(geom = "text", -0.25, -1.3, label ="Mixed-\nconifer \nRegeneration", colour = "green4", size = 5, fontface = "bold")+
+  annotate(geom = "text", 1.1, 1.5, label ="a)", size = 4, fontface = "bold")+
   annotate(geom = "text", 1, .2, label ="Oak-\nshrub", colour = "green4", size = 5, fontface = "bold")
 Sto <- direct.label(S, "top.points")
 
@@ -234,10 +234,10 @@ C <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   coord_cartesian(xlim = c(-1.6,1.1), ylim = c(-1.5,1.5))+
   stat_contour(data = Cordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
-  labs(colour="Fire severity\n(RdNBR)", title=expression("Chips Fire (r"^"2"*"=0.35)"))+
+  #labs(colour="Fire severity\n(RdNBR)", title=expression("Chips Fire (r"^"2"*"=0.35)"))+
   theme(plot.title = element_text(hjust=.5, size=15), legend.position = "none")+
   annotate(geom = "text", -1.5, .2, label ="Mixed-\nconifer \nForest", colour = "green4", size = 5, fontface = "bold")+
-  #annotate(geom = "text", -0.25, -1.3, label ="Mixed-\nconifer \nRegeneration", colour = "green4", size = 5, fontface = "bold")+
+  annotate(geom = "text", 1.1, 1.5, label ="b)", size = 4, fontface = "bold")+
   annotate(geom = "text", 1, .2, label ="Oak-\nshrub", colour = "green4", size = 5, fontface = "bold")
 Chip <- direct.label(C, "top.points")
                      
@@ -248,7 +248,7 @@ Chip <- direct.label(C, "top.points")
 #Sto$widths[5:3] <- maxWidth
 
 #stack both ggplots
-all <- grid.arrange(Sto, Chip, Spp, nrow=2, ncol=2)
+all <- grid.arrange(Sto, Chip, Spp, nrow=1, ncol=3)
 
 #setwd("/Users/dnemens/Dropbox/CBO/plots")
 #ggsave(fine, filename = "ggordi_sidebyside.jpg")

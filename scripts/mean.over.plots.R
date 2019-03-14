@@ -25,6 +25,11 @@ import.sum <- import %>%
                sd   = sd(Importance.Value),
                se   = sd / sqrt(N))
 
+sum1 <- data.frame(t(import.sum))
+#save as file
+write.csv(sum1, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sum.over.Storrie.csv", row.names = F)
+
+
 #summarize basic stats by combined Severity   
 import.comb <- import %>%
   unite("comb", c(Storrie, Chips), sep = "/", remove = F)
@@ -35,6 +40,10 @@ import.sum2 <- import.comb %>%
             mean = mean(Importance.Value),
             sd   = sd(Importance.Value),
             se   = sd / sqrt(N))
+
+sum2 <- data.frame(t(import.sum))
+#save as file
+write.csv(sum2, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/sum.over.combined.csv", row.names = F)
 
 #### Stratify by stage
 import.pre <- subset(import.sum, time == "Pre-fire")
@@ -77,3 +86,21 @@ postC <- ggplot(import.postC, aes(y=mean, x=comb, fill=Species)) +
 
 library(gridExtra)
 grid.arrange(pre, postS, postC, nrow = 3)
+
+
+#### histograms of diam distr
+comp <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.KSQ.KCQ.csv")
+comp[is.na(comp)] <- 0
+
+comp <- comp %>%
+  filter(Spp %in% c("ABCO","PILA","PIPO"))
+
+colors <- brewer.pal(n = 6, name = "RdBu")
+
+ggplot(comp, aes(x=dbh, fill=Spp)) + 
+  geom_histogram(binwidth = 2)+
+# facet_wrap(~Spp)+
+  #geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
+  scale_fill_manual(values= colors, name = "Species")+
+  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5))+
+  coord_cartesian(xlim = c(0,75))

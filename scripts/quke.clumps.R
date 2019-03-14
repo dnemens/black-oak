@@ -94,5 +94,13 @@ qukes.C <- quke.clumps %>%
   group_by(Chips) %>%
   summarize(clumps = mean(clumps.ha)) 
 
+########################################################
+#determines whether fire history is mostly uniform for quke clumps in each plot
+q <- comp %>%
+  filter(!snag.class %in% c("", " ")) %>%
+  filter(!fire.hist %in% c("", " ", "U")) %>%
+  filter(Spp == "QUKE") %>%
+  group_by(plot) %>%
+  summarise(n = n_distinct(fire.hist))
 
-
+hist(q$n)

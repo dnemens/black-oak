@@ -80,10 +80,40 @@ crown2 <- crown2 %>%
   separate(rdnbr.plot, c("Storrie", "Chips", "Plot"), remove = T) %>%
   select(-Plot, -Storrie)
 
+under2 <- rbind(crown2, density3, freq2)
+under2 <- under2[c(1,8,2:7)]
+
+#turn into long form data frame
+#might need to reload dpylr before executing?  
+under2 <- under2 %>%
+  gather(3:8, key = Species, value = val)
+
+########### Prep for ggplot
+under2.sum <- under2 %>%
+  group_by(Chips, Species, comp) %>%
+  summarise(N = length(val),
+            mean = mean(val),
+            sd   = sd(val),
+            se   = sd / sqrt(N))
+
+########## Plot! 
+colors <- brewer.pal(n = 6, name = "RdBu")
+
+ggplot(under2.sum, aes(y=mean, x=Chips, fill=Species)) + 
+  facet_wrap(~comp)+
+  geom_bar(stat="identity", width = .5, position = position_dodge(.7))+
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.7), width = .4)+
+  scale_fill_manual(values= colors, name = "Species")+
+  ylab("")+
+  xlab("Chips Fire Severity")+
+  labs(title = "Mean Understory Components")+
+  theme(axis.text.x = element_text(angle = 45), panel.grid = element_blank(), plot.title = element_text(hjust = 0.5))
+
+##############################################################
 ######creates matrix of importance values
 under.import <- (crown+density+freq)*100
 
-#under.import <- data.frame(rdnbr$combined, under.import)
+under.import.comb <- data.frame(rdnbr$combined, under.import)
 
 ############## convert to long form
 under.import2 <- data.frame(rdnbr$plot, under.import)
@@ -92,6 +122,30 @@ under.import2 <- gather(under.import2, key = "Species", value = "Importance.Valu
 
 under.import2 <-  under.import2 %>%
   rename ("plot" = rdnbr.plot)
+################# convert combined sev to long form
+under.import.comb2 <- gather(under.import.comb, key = "Species", value = "Importance.Value", ABCO:QUKE)
+
+under.import.comb2 <- rename (under.import.comb2, comb = rdnbr.combined)
+
+#Prep for ggplot - combined severity
+#calculate stats for error bars etc.  
+under.comb.sum <- under.import.comb2 %>%
+  group_by(comb, Species) %>%
+  summarise(N = length(Importance.Value),
+            mean = mean(Importance.Value),
+            sd   = sd(Importance.Value),
+            se   = sd / sqrt(N))
+##PLot!
+colors <- brewer.pal(n = 6, name = "RdBu")
+
+ggplot(under.comb.sum, aes(y=mean, x=comb, fill=Species)) + 
+  geom_bar(stat="identity", width = .5, position = position_dodge(.7))+
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.7), width = .4)+
+  scale_fill_manual(values= colors, name = "Species")+
+  ylab("Mean Importance Value")+
+  xlab("Combined Fire Severity")+
+  labs(title = "Mean Understory Importance Values")+
+  theme(axis.text.x = element_text(angle = 45), panel.grid = element_blank(), plot.title = element_text(hjust = 0.5), panel.background = element_blank())
 
 #####################################
 #prep for ggplot
@@ -119,8 +173,6 @@ ggplot(under.sum, aes(y=mean, x=Chips, fill=Species)) +
   xlab("Chips Fire Severity")+
   labs(title = "Mean Understory Importance Values")+
   theme(axis.text.x = element_text(angle = 45), panel.grid = element_blank(), plot.title = element_text(hjust = 0.5), panel.background = element_blank())
-
-
 
 
 #####base R Plotting

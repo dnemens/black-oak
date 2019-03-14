@@ -1,9 +1,7 @@
-#calculates stats for tables
+#calculates stats for tables (QMD, SDI, TPH)
 
-library(nlme)
 library(tidyverse)
 library(vegan)
-library(RColorBrewer)
 
 #######################
 #import overstory data
@@ -31,20 +29,6 @@ import <-  read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/mean.imp
 #Order time factor
 import$time <- ordered(import$time, levels = c("Pre-fire", "Post-Storrie Fire", "Post-Chips Fire"))
 
-############
-#repeated measures ANoVA for importance values
-imp <- import$Importance.Value
-time <- import$time
-spp <- import$Species
-
-corAR1()
-
-model = lme(imp ~ time + spp + spp*time, 
-            correlation = corAR1(form = ~ Month | Student,
-                                 value = 0.4287),
-            data=Data,
-            method="REML")
-
 ################
 #TPHa
 pre.density <- comp %>%
@@ -65,7 +49,9 @@ pre.dens <- pre.density %>%
 pre.dens <- pre.dens %>%
   mutate(tph = tpp*22.22)
 
-########
+tph <- pre.dens$tph
+
+######## basal area
 pre.basal <- comp %>%
   group_by(plot, Spp) %>%
   filter(!fire.hist %in% c("CP", "PLSKC", "PLSSC", "U", "SC", "SPSC")) %>%
@@ -83,51 +69,39 @@ pre.basal [is.na(pre.basal)] <- 0
 pre.bas <- pre.basal %>%
   gather(2:7, key = "Spp", value = "ba")
 
+##########
 #create vectors
 ba <- pre.bas$ba
-tpa <- pre.dens$tph
-
+tph <- pre.dens$tph
 
 #QMD
-qmd = function( ba, tph, unittype="imperial" )
+qmd = function( ba, tph)
 {
     qmd = sqrt((ba / tph) / 0.00007854)
   }
   qmd
 
+QMD <- qmd (ba, tph)
 
-#basal area
-basalarea = function( dia, weight, unittype="imperial" )
-{
-  # Function to calculate the basal area per unit area
-  # weight is the expansion factor to convert the sample area number to 
-  # the unit area.
-  # By David R. Larsen, Copyright, October 9, 2012
-  # Creative Commons http://creativecommons.org/licenses/by-nc/3.0/us/
-  
-  if ( unittype == "imperial" ){
-    bat = 0.005454154 * dia ^ 2 * weight
-  }else if ( unittype == "metic" ){
-    bat = 0.00007854 * dia ^ 2 * weight
-  }else{
-    bat = rep( 0, length=length(dia) )
-  }
-  ba = sum(bat)
-  ba
-}
 #Stand density index
-sdi = function( tpa, qmd, unittype="imperial" )
+sdi = function( tph, qmd )
 {
-  # Function to calculate the stand density index
-  # by David R. Larsen, Copyright October 9, 2012
-  # Creative Commons http://creativecommons.org/licenses/by-nc/3.0/us/
-  
-  if (unittype == "imperial" ){
-    sdi = tpa * ( qmd / 10 )^ 1.605
-  }else if ( unittype == "metric" ){
-    sdi = tpa * ( qmd / 25.4)^1.605
-  }else{
-    sdi = 0
-  }
+      sdi = (tph * (qmd / 25.4)^1.605)
+    }
   sdi
-}  
+
+  SDI <- sdi(ba, QMD)
+  
+#create csv with stats
+stats <- data.frame(pre.bas, tph, QMD, SDI)
+
+write.csv(stats, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/over.stats.raw", row.names = F)
+
+stats.sum <- stats %>%
+  separate(plot, c("Storrie", "Chips", "Plot"), remove = F) %>%
+  select(-Plot) %>%
+  group_by(Storrie, Chips, Spp) %>%
+  summarise(mean.BA = mean(ba), sd.BA = sd(ba), mean.tph = mean(tph), sd.tph = sd(tph), mean.SDI = mean(SDI), sd.SDI = sd(SDI), mean.QMD = mean(QMD), sd.QMD = sd(QMD))
+
+write.csv(stats.sum, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/over.stats.summary.csv", row.names = F)
+  

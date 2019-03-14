@@ -9,10 +9,48 @@ library(RColorBrewer)
 comp <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.KSQ.KCQ.csv")
 comp[is.na(comp)] <- 0
 
-#combine snag/stump and dbh 
+#convert snag/stump diam to dbh 
 comp <- comp %>%
-  rename(diam = dbh, stump = snag_stump..diam) %>%
+  rename(diam=dbh, stump = snag_stump..diam) %>%
   mutate(dbh = (diam + stump))
+
+##########
+#convert stump diameter to dbh??  
+
+#comp.stump <- subset(comp, comp$stump > 0)
+
+#stump <- comp$stump
+#Spp <- comp.stump$Spp
+
+#if(Spp == 'ABCO') {
+#      comp$diam = -0.07417 + 1.01448*stump 
+ #     }    else if (Spp == "PSME") {
+  #    comp$diam <-  -0.92870 + 1.06029*stump 
+  #    }    else if (comp$Spp == "PIPO"){
+  #    comp$diam <-  -0.30625 + 1.00784*stump 
+  #    }    else if (comp$Spp == "PILA") {
+  #    comp$diam <-  0.50682 + 0.94638*stump 
+  #    }    else if (comp$Spp == "CADE") {
+  #    comp$diam <-  -1.80074 + 1.11149*stump 
+  #    }    else {comp$diam <- stump}
+
+#comp.stump$diam <- ifelse(comp.stump$Spp == "ABCO",
+#  comp.stump$diam  <-  (-0.07417 + 1.01448*stump), comp.stump$diam <- stump) #this wipes out every previous change!!
+ 
+#comp.stump$diam <- ifelse (Spp == "PSME",
+#  comp.stump$diam <-  (-0.92870 + 1.06029*stump), comp.stump$diam <- stump)
+  
+#comp.stump$diam <- ifelse (comp.stump$Spp == "PIPO",
+#  comp.stump$diam <-  (-0.30625 + 1.00784*stump), comp.stump$diam <- stump)
+  
+#comp.stump$diam <-  ifelse (comp.stump$Spp == "PILA",
+#  comp.stump$diam <-  (0.50682 + 0.94638*stump), comp.stump$diam <- stump) 
+
+# comp.stump$diam <-  ifelse (comp.stump$Spp == "CADE",
+#  comp.stump$diam <-  (-1.80074 + 1.11149*stump), comp.stump$diam <- stump) 
+
+#postS.basal$QUKE <- ifelse(postS.basal$QUKE==0, qukes$Sto.ba, postS.basal$QUKE)
+#  mutate(dbh = (diam + stump))
 
 #import sumarized focal oak data 
 qukes <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/quke.clumps.csv")
@@ -22,8 +60,8 @@ rdnbr <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv
 #break into severity categories for each fire
 rdnbr <- rdnbr %>% 
   separate(plot, c("Storrie", "Chips", "Plot"), remove = F) %>%
-  select(-Plot)
-
+  select(-plot)
+  
 #reclassify severity factors as names vs. numbers
 rdnbr$Storrie <- factor(rdnbr$Storrie, labels = c("Unburned", "Low", "Moderate", "High"), ordered = is.ordered(rdnbr$Storrie))
 
@@ -64,7 +102,7 @@ pre.freq <- pre.freq[2:7]
 
 ###calculates total basal area for each species
 
-pre.basal <- pre.basal %>%
+pre.basal <- comp %>%
   group_by(plot, Spp) %>%
   filter(!fire.hist %in% c("CP", "PLSKC", "PLSSC", "U", "SC", "SPSC")) %>%
   summarize(sum.dbh = sum(dbh)) %>%
@@ -239,6 +277,7 @@ postC.import2 <- postC.import2 %>%
 postC.import2 <-  postC.import2 %>%
   rename ("plot" = rdnbr.plot)
 postC.import2$time <- as.factor("Post-Chips Fire")
+
 ############################################
 #save wide file of mean vals for stats
 #prep
@@ -254,6 +293,8 @@ write.csv(all.import, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets
 all.import2 <- rbind(pre.import2, postS.import2, postC.import2)
 
 write.csv(all.import2, file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/mean.import.over.long.csv", row.names = F)
+
+##################################
 ##################################
 #plots with continuous (rdnbr) predictor variables
 par(mfrow=c(2,2))
