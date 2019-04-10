@@ -1,4 +1,5 @@
-#caluculates MEAN importance values for each species in overstory pre and post fire by plot
+#caluculates MEAN importance values for each species in overstory - pre and post fire by plot
+#creates CSV of these values for use in other scripts
 
 library(tidyverse)
 library(vegan)
@@ -58,17 +59,17 @@ qukes <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/quke.clump
 #severity data
 rdnbr <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
 #break into severity categories for each fire
-rdnbr <- rdnbr %>% 
-  separate(plot, c("Storrie", "Chips", "Plot"), remove = F) %>%
-  select(-plot)
+#rdnbr <- rdnbr %>% 
+#  separate(plot, c("Storrie", "Chips", "Plot"), remove = F) %>%
+#  select(-plot)
   
 #reclassify severity factors as names vs. numbers
-rdnbr$Storrie <- factor(rdnbr$Storrie, labels = c("Unburned", "Low", "Moderate", "High"), ordered = is.ordered(rdnbr$Storrie))
+#rdnbr$Storrie <- factor(rdnbr$Storrie, labels = c("Unburned", "Low", "Moderate", "High"), ordered = is.ordered(rdnbr$Storrie))
 
-rdnbr$Chips <- factor(rdnbr$Chips, labels = c("Unburned", "Low", "Moderate", "High"), ordered = is.ordered(rdnbr$Chips))
+#rdnbr$Chips <- factor(rdnbr$Chips, labels = c("Unburned", "Low", "Moderate", "High"), ordered = is.ordered(rdnbr$Chips))
 
-rdnbr <- rdnbr %>%
-  mutate(combined = storrie_rdnbr+chips_rdnbr)
+#rdnbr <- rdnbr %>%
+ # mutate(combined = storrie_rdnbr+chips_rdnbr)
 ########################
 #Pre-fire values
 
@@ -105,9 +106,8 @@ pre.freq <- pre.freq[2:7]
 pre.basal <- comp %>%
   group_by(plot, Spp) %>%
   filter(!fire.hist %in% c("CP", "PLSKC", "PLSSC", "U", "SC", "SPSC")) %>%
-  summarize(sum.dbh = sum(dbh)) %>%
-  mutate(ba=(.0017*sum.dbh^2)) %>%
-  select(-sum.dbh)
+  mutate(trba=(0.00007854*dbh^2)) %>%
+  summarize(ba=sum(trba)*22.22) 
 
 #transposes rows to columns
 pre.basal <- spread(pre.basal, key = "Spp", value = "ba", fill = 0.0)
@@ -167,16 +167,15 @@ postS.freq <- postS.freq[2:7]
 postS.basal <- comp %>%
   group_by(plot,Spp) %>%
   filter(!fire.hist %in% c("CP", "PLSKC", "PLSSC", "KS", "U", "KSQ", "SC")) %>%
-  summarize(sum.dbh = sum(dbh)) %>%
-  mutate(ba=(.0017*sum.dbh^2)) %>%
-  select(-sum.dbh)
+  mutate(trba=(0.00007854*dbh^2)) %>%
+  summarize(ba=sum(trba)*22.22)
 
 #transposes rows to columns
 postS.basal <- spread(postS.basal, key = "Spp", value = "ba", fill = 0.0)
 
 #Adds in basal diameters of Storrie sprouts from focal oak data - multiplied by num of clumps in each plot
 qukes <- qukes %>%
-  mutate(Sto.ba = ((diam.storrie.live+diam.storrie.dead)^2*.0017*clumps))
+  mutate(Sto.ba = ((baSL+baSD)*22.22*clumps))
 
 QUKE2 <- qukes$Sto.ba
   
@@ -240,18 +239,17 @@ postC.freq <- postC.freq[2:7]
 postC.basal <- comp %>%
   group_by(plot, Spp) %>%
   filter(!fire.hist %in% c("PLSKC", "PLSSC", "KS", "U", "KC", "KSQ", "KCQ", "SSKCQ", "SSKC")) %>%
-  summarize(sum.dbh = sum(dbh)) %>%
-  mutate(ba=(.0017*sum.dbh^2)) %>%
-  select(-sum.dbh)
+  mutate(trba=(0.00007854*dbh^2)) %>%
+  summarize(ba=sum(trba)*22.22)
 
 #transposes rows to columns
 postC.basal <- spread(postC.basal, key = "Spp", value = "ba", fill = 0.0)
 
 #Adds in basal diameters of Storrie sprouts from focal oak data - multiplied by num of clumps in each plot
-qukes2 <- qukes %>%
-  mutate(Chips.ba = ((diam.storrie.live+diam.chips)^2*.0017*clumps))
+qukes <- qukes %>%
+  mutate(Chips.ba = ((baSL+baC)*22.22*clumps))
 
-QUKE2c <- qukes2$Chips.ba
+QUKE2c <- qukes$Chips.ba
 
 #ADDS basal area of sprouts using extrapolated focal oak data
 postC.basal$QUKE= (QUKE2c+postC.basal$QUKE)

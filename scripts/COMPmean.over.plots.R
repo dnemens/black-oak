@@ -55,7 +55,7 @@ import.postC$comb <- factor(import.postC$comb, levels = c("Unburned/Unburned", "
 colors <- brewer.pal(n = 6, name = "RdBu")
 
 pre <- ggplot(import.pre, aes(y=mean, x=Storrie, fill=Species)) + 
-  geom_bar(stat="identity", position = "dodge")+
+  geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
   scale_fill_manual(values= colors, name = "Species")+
   ylab("Importance Value")+
@@ -65,7 +65,7 @@ pre <- ggplot(import.pre, aes(y=mean, x=Storrie, fill=Species)) +
   scale_y_continuous(limits = c(0,315))
 
 postS <- ggplot(import.postS, aes(y=mean, x=Storrie, fill=Species)) + 
-  geom_bar(stat="identity", position = "dodge")+
+  geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
   scale_fill_manual(values= colors, name = "Species")+
   ylab("Importance Value")+
@@ -76,7 +76,7 @@ postS <- ggplot(import.postS, aes(y=mean, x=Storrie, fill=Species)) +
 
 postC <- ggplot(import.postC, aes(y=mean, x=comb, fill=Species)) + 
   #facet_wrap(~Storrie)+
-  geom_bar(stat="identity", width = .5, position = position_dodge(.7))+
+  geom_bar (stat= "summary", fun.y = "mean", position = "dodge", width = .5, position = position_dodge(.7))+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.7), width = .4)+
   scale_fill_manual(values= colors, name = "Species")+
   ylab("Importance Value")+

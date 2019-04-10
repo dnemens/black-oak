@@ -46,8 +46,9 @@ pS.trees <- comp %>%
   filter(Spp %in% c("ABCO", "CADE", "PILA", "PIPO", "PSME", "QUKE")) 
 
 #Adds in basal diameters of Storrie sprouts from focal oak data - multiplied by num of clumps in each plot
+#calculate quke sprout diams
 qukes <- qukes %>%
-  mutate(Sto.dbh = ((diam.storrie.live+diam.storrie.dead)*clumps))
+  mutate(Sto.dbh = ((Sldiam+SDdiam)*clumps))
 
 #filter out QUKE from other spps 
 q <- filter(pS.trees, Spp=="QUKE")
@@ -81,7 +82,7 @@ pC.trees <- comp %>%
 
 #Adds in dbh of Storrie/Chips sprouts from focal oak data - multiplied by num of clumps in each plot
 qukeC <- qukes %>%
-  mutate(Chips.dbh = ((diam.storrie.live+diam.chips)*clumps))
+  mutate(Chips.dbh = ((Sldiam+Cldiam)*clumps))
 
 #filter out QUKE from other spps 
 qC <- filter(pC.trees, Spp=="QUKE")
@@ -146,7 +147,7 @@ text(.09,.16, label = "Sig = .001", cex = 1.3)
 text(.09,.14, label = bquote(m^2 == 0.73), cex = 1.3)
 
 #main = "Total change pre-fire to post-Chips Fire", 
-plot(pro3, main = "", xlab = "", ylab ="", xaxt = "n", yaxt = "n", ar.col = "red")
+plot(pro3, main = "", xlab = "", ylab ="", xaxt = "n", yaxt = "n", ar.col = "grey20")
 text(.17,.20, label = "h)", cex = 1.3, font = 2)
 text(.17,.175, label = "Sig = .001", cex = 1.3)
 text(.17,.155, label = expression("m"^"2"*" = 0.89"), cex = 1.3)
@@ -174,7 +175,7 @@ a <- ggplot ()+
   #labs(title="Pre-Fire")+
   theme(plot.title = element_text(hjust = 0.5), legend.position = c(1,.15), legend.justification = c(1.1,.9), legend.title = element_blank())+
   theme(panel.grid = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())+
-  scale_color_manual(values = c("red", "blue"), labels = c("Fire Sensitive", "Fire Tolerant"))+
+  scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
   annotate(geom = "text", 1.5, 1, label = "a)", size = 5, hjust = 1) +
   #annotate(geom = "text", 1.5, 1, label = "Stress = 0.12", size = 5, hjust = 1)+
   coord_cartesian(ylim = c(-1,1.05))
@@ -185,19 +186,19 @@ b <- ggplot()+
   #labs(title="Post-Storrie Fire")+
   theme(plot.title = element_text(hjust = 0.5), legend.position = "")+
   theme(panel.grid = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())+
-  scale_color_manual(values = c("red", "blue"), labels = c("Fire Sensitive", "Fire Tolerant"))+
+  scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
   annotate(geom = "text", 1.5, 1, label = "b)", size = 5, hjust = 1) +
   #annotate(geom = "text", 1.5, 1, label = "Stress = 0.08", size = 5, hjust = 1)+
   coord_cartesian(ylim = c(-1,1.05))
 
 c <- ggplot()+
-  geom_point(data=gp3, aes(NMDS1, NMDS2), colour = "red", size = 2, alpha = .5)+
+  geom_point(data=gp3, aes(NMDS1, NMDS2), colour = "grey20", size = 2, alpha = .5)+
   geom_text_repel(data= sp3, aes(x=MDS1, y=MDS2, label=rownames(sp3), colour = fire), fontface = "bold", force = .01)+
   #geom_text(data= sp3, aes(x=MDS1, y=MDS2, label=rownames(sp3)), fontface = "bold")+
   #labs(title = "Post-Chips Fire")+
   theme(plot.title = element_text(hjust = 0.5), legend.position = "")+
   theme(panel.grid = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())+
-  scale_color_manual(values = c("red", "blue"), labels = c("Fire Sensitive", "Fire Tolerant"))+
+  scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
   annotate(geom = "text", 1.5, 1, label = "c)", size = 5, hjust = 1) +
   #annotate(geom = "text", 1.5, 1, label = "Stress = 0.05", size = 5, hjust = 1)+
   coord_cartesian(ylim = c(-1,1.05))

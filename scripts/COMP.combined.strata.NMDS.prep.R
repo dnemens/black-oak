@@ -1,4 +1,4 @@
-#preps overstory and midstory data for nmds
+#preps combined overstory and midstory data for nmds
 
 library(labdsv)
 library(tidyverse)
@@ -49,7 +49,7 @@ pS.trees <- comp %>%
 
 #Adds in basal diameters of Storrie sprouts from focal oak data - multiplied by num of clumps in each plot
 qukes <- qukes %>%
-  mutate(Sto.dbh = ((diam.storrie.live+diam.storrie.dead)*clumps))
+  mutate(Sto.dbh = ((Sldiam+SDdiam)*clumps))
 
 #filter out QUKE from other spps 
 q <- filter(pS.trees, Spp=="QUKE")
@@ -88,7 +88,7 @@ pC.trees <- comp %>%
 
 #Adds in dbh of Storrie/Chips sprouts from focal oak data - multiplied by num of clumps in each plot
 qukeC <- qukes %>%
-  mutate(Chips.dbh = ((diam.storrie.live+diam.chips)*clumps))
+  mutate(Chips.dbh = ((Sldiam+Cldiam)*clumps))
 
 #filter out QUKE from other spps 
 qC <- filter(pC.trees, Spp=="QUKE")
@@ -110,9 +110,11 @@ pC.trees <- pC.trees %>%
 
 pC.trees <- pC.trees[2:7]
 
-#standardize by Species max, then plot total (propotional contribution of each species) 
-pC.treesR <- vegdist(wisconsin(pC.trees), method = "bray")
+#relativize by Species max, then plot total (propotional contribution of each species)
+#pC.treesR <- vegdist(wisconsin(pC.trees), method = "bray")
 
+#relativize by plot total only, then create dist matrix
+PC.trees.R <- decostand(pC.trees, "total")
 #################
 
 #import shrub data (center sub-plot)
@@ -136,7 +138,7 @@ cover.C <- vegtab(taxa = cover, minval = (.05*nrow(cover)))
 pC.ts <- data.frame(pC.trees, cover.C)
 
 #relativize each species by maxima
-pc.tsR <- wisconsin(pC.ts)
+pc.tsR <- decostand(pC.ts, "max")
 
 ############## NMDS
 z <- metaMDS(pc.tsR, autotransform = F, k = 3, try=30, trymax = 75)
@@ -146,7 +148,7 @@ plot(z, display = "sites", type = "n")
 #display spp scores
 sp <- wascores(x = z$points, w = pc.tsR, expand = TRUE)
 points(z, display = "sites", pch = 19, col = "grey50")
-text(sp, rownames(sp), col = "blue", font = 2, pos = 2, adj = 5)
+text(sp, rownames(sp), col = "red", font = 2, pos = 2, adj = 5)
 
 #assess correlation between axes and variables
 cor(pc.tsR, z$points)
@@ -207,7 +209,7 @@ Spp <-
   theme(panel.grid = element_blank(), legend.title = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(0,1), legend.justification = c(0,1))+
   #Position legend in graph, where x,y is 0,0 (bottom left) to 1,1 (top right)
   coord_cartesian(xlim = c(-1.6,1.1), ylim = c(-1.5,1.5))+
-  scale_color_manual(values = c("red", "blue"), labels = c("Fire Sensitive", "Fire Tolerant"))+
+  scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
   annotate(geom = "text", -1.5, .2, label ="Mixed-\nconifer \nForest", colour = "green4", size = 5, fontface = "bold")+
   annotate(geom = "text", 1.1, 1.5, label ="c)", size = 4, fontface = "bold")+
   annotate(geom = "text", 1, .2, label ="Oak-\nshrub", colour = "green4", size = 5, fontface = "bold")

@@ -1,4 +1,4 @@
-#summary stats of basal area and sprouts per clump, plot and ha
+#summary stats of basal area and sprouts per clump, plot and ha for Focal Oak data
 
 comp <- read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.csv")
 comp[is.na(comp)] <- 0
@@ -18,8 +18,12 @@ qukes2 <- comp %>%
   summarize(clumps = n()) 
 
 sprouts <- sprout %>%
+  mutate(baSD = storrie.dead^2*.00007854, baSL = storrie.live^2*.00007854, baC = chips.live^2*.00007854)
+  
+#summed basal area/ha per focal oak, NOT per plot
+sprouts <- sprouts %>%
   group_by(plot) %>%
-  summarise(diam.storrie.live = sum(storrie.live), diam.storrie.dead = (sum(storrie.dead)), diam.chips = sum(chips.live))
+  summarize(baSD = sum(baSD), baSL = sum(baSL), baC = sum(baC), SDdiam = sum(storrie.dead), Sldiam = sum(storrie.live), Cldiam = sum(chips.live))
 
 #merges both df's keeping plots with no clumps
 qukes2 <- merge(qukes2, sprouts, by="plot", all.y = T)

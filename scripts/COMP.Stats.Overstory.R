@@ -36,6 +36,11 @@ mimps <- rename(mimps, Storrie = imps.Storrie,  storR =rdnbr.storrie_rdnbr)
 
 limps <- gather(mimps, key = "Species", value = "mean.val", 3:8)
 
+ab <- filter(limps, Species == "ABCO")
+amod <- aov(ab$mean.val~ab$Storrie)
+summary(amod)
+TukeyHSD(amod)
+
 #########Plot this
 library(RColorBrewer)
 colors <- brewer.pal(n = 6, name = "RdBu")
@@ -45,7 +50,9 @@ ggplot(data=limps, aes(x=storR, y=mean.val, colour=Species))+
   ylab("delta Importance Value")+
   xlab("Fire severity (RdNBR)")+
   scale_colour_manual(values= colors, name = "Species")+
-  coord_cartesian(ylim = c(-310,310))
+  coord_cartesian(ylim = c(-310,310))+
+  geom_hline(yintercept=0)+
+  theme_classic()
 
 
 ############
