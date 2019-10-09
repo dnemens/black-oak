@@ -52,37 +52,45 @@ import.postC <- subset(import.sum2, time == "Post-Chips Fire")
 import.postC$comb <- factor(import.postC$comb, levels = c("Unburned/Unburned", "Unburned/Low","Unburned/Moderate", "Unburned/High","Low/Unburned", "Low/Low", "Low/Moderate","Low/High","Moderate/Unburned", "Moderate/Low", "Moderate/Moderate", "Moderate/High",  "High/Unburned", "High/Low", "High/Moderate", "High/High"), ordered = is.ordered(import.postC$comb))
 
 ##PLot!
-colors <- brewer.pal(n = 6, name = "RdBu")
+#colors <- brewer.pal(n = 6, name = "RdBu")
+colors <- c('#fafac4', '#f9f17f', '#fd8d3c','#d94801','#86131f','#430a0f') #sequential, greyscaleable
+colorsG <- ColToGray(colors) #converts to greyscale
 
 pre <- ggplot(import.pre, aes(y=mean, x=Storrie, fill=Species)) + 
   geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
   scale_fill_manual(values= colors, name = "Species")+
   ylab("Importance Value")+
-  xlab("Storrie Severity")+
-  labs(title = "Mean Pre-fire Importance Values")+
-  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(limits = c(0,315))
+  #xlab("Storrie Severity")+
+  #labs(title = "Mean Pre-fire Importance Values")+
+  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5), axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2))+
+  scale_y_continuous(limits = c(0,315))+
+  theme(plot.margin = margin(0, 1, 6, 1, "pt"))+
+  annotate(geom = "text", .5, 300, label = "a)", size = 5)
 
 postS <- ggplot(import.postS, aes(y=mean, x=Storrie, fill=Species)) + 
   geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
   scale_fill_manual(values= colors, name = "Species")+
   ylab("Importance Value")+
-  xlab("Storrie Severity")+
-  labs(title = "Mean Post-Storrie Importance Values")+
-  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5))+
-  scale_y_continuous(limits = c(0,315))
+  #xlab("Storrie Severity")+
+  #labs(title = "Mean Post-Storrie Importance Values")+
+  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5), legend.position = 0, axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2))+
+  scale_y_continuous(limits = c(0,315))+
+  theme(plot.margin = margin(0, 70, 5, 1, "pt"))+
+  annotate(geom = "text", .5, 300, label = "b)", size = 5)
 
 postC <- ggplot(import.postC, aes(y=mean, x=comb, fill=Species)) + 
-  #facet_wrap(~Storrie)+
-  geom_bar (stat= "summary", fun.y = "mean", position = "dodge", width = .5, position = position_dodge(.7))+
+  geom_bar (stat= "summary", fun.y = "mean", width = .5, position = position_dodge(.7))+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.7), width = .4)+
   scale_fill_manual(values= colors, name = "Species")+
   ylab("Importance Value")+
-  xlab("Combined Severity")+
-  labs(title = "Mean Post-Chips Importance Values", hjust = .5)+
-  theme(axis.text.x = element_text(angle = 45), legend.position = 0, panel.grid = element_blank(), plot.title = element_text(hjust = 0.5), panel.background = element_blank())
+  xlab("Fire Severity")+
+  #labs(title = "Mean Post-Chips Importance Values", hjust = .5)+
+  theme(axis.text.x = element_text(angle = 45), legend.position = 0, panel.grid = element_blank(), plot.title = element_text(hjust = 0.5), panel.background = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2))+
+  theme(plot.margin = margin(0, 0, 0, 1, "pt"))+
+  theme(axis.title.x = element_text(margin = margin(t = -20, r = 0, b = 0, l = 0)))+
+  annotate(geom = "text", .8, 300, label = "c)", size = 5)
 
 library(gridExtra)
 grid.arrange(pre, postS, postC, nrow = 3)

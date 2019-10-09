@@ -141,7 +141,7 @@ postC.basal <- comp %>%
 #transposes rows to columns
 postC.basal <- spread(postC.basal, key = "Spp", value = "ba", fill = 0.0)
 
-#Adds in basal diameters of Storrie sprouts from focal oak data - multiplied by num of clumps in each plot
+#Adds in basal diameters of Chips sprouts from focal oak data - multiplied by num of clumps in each plot
 qukes2 <- qukes %>%
   mutate(Chips.ba = ((baSL+baC)*22.22*clumps))
 

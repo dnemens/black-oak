@@ -1,8 +1,8 @@
-#multivariate stats and some plots for analysis of changes in species abundance between fires
+#multivariate stats and some plots for analysis of changes in overstory species abundance between fires
 
 library(vegan)
 library(ggrepel)
-library(dplyr)
+library(tidyverse)
 
 ### PREP
 #create dataframe of abundances (basal area) for each stage (pre-postS-postC)
@@ -133,24 +133,25 @@ pro3 <- protest(z1, z3)
 pro3
 plot(pro3)
 
+#PLOTS PROCRUSTES COMPARING ORDINATIONS OF EACH CONDITION  
 par(mfrow=c(1,3))
 #main = "Change pre-fire to post-Storrie Fire", 
 plot(pro1, main = "", xlab = "", ylab ="", xaxt = "n", yaxt = "n", ar.col = "green4")
-text(.175, .21, label = "f)", cex = 1.3, font = 2)
-text(.175, .185, label = "Sig = .001", cex = 1.3)
-text(.175, .165, label = bquote(m^2 == 0.78), cex = 1.3)
+text(.175, .21, label = "f)", cex = 2, font = 2)
+text(.175, .185, label = "Sig = .001", cex = 2)
+text(.175, .165, label = bquote(m^2 == 0.78), cex = 2)
 
 #main = "Change post-Storrie Fire to post-Chips Fire", 
 plot(pro2, main = "", xlab = "", ylab ="", xaxt = "n", yaxt = "n", ar.col = "darkmagenta")
-text(.09,.18, label = "g)", cex = 1.3, font = 2)
-text(.09,.16, label = "Sig = .001", cex = 1.3)
-text(.09,.14, label = bquote(m^2 == 0.73), cex = 1.3)
+text(.09,.18, label = "g)", cex = 2, font = 2)
+text(.09,.16, label = "Sig = .001", cex = 2)
+text(.09,.14, label = bquote(m^2 == 0.73), cex = 2)
 
 #main = "Total change pre-fire to post-Chips Fire", 
 plot(pro3, main = "", xlab = "", ylab ="", xaxt = "n", yaxt = "n", ar.col = "grey20")
-text(.17,.20, label = "h)", cex = 1.3, font = 2)
-text(.17,.175, label = "Sig = .001", cex = 1.3)
-text(.17,.155, label = expression("m"^"2"*" = 0.89"), cex = 1.3)
+text(.17,.20, label = "h)", cex = 2, font = 2)
+text(.17,.175, label = "Sig = .001", cex = 2)
+text(.17,.155, label = expression("m"^"2"*" = 0.89"), cex = 2)
 
 ###########################
 #visualize Ordinations
@@ -167,44 +168,47 @@ sp2$fire = as.factor(c(1,1,2,2,1,2))
 sp3 <- as.data.frame(wascores(x = z3$points, w = pC.treesR, expand = TRUE))
 sp3$fire = as.factor(c(1,1,2,2,1,2))
 #############################
-
-#plot 
+#PLOT ORDINATIONS OF OVERSTORY FOR EACH CONDITION 
+#PRE-FIRE
 a <- ggplot ()+
   geom_point(data=gp1, aes(x=NMDS1, y=NMDS2), colour = "green4", alpha = .5, size = 2)+
-  geom_text(data= sp1, aes(x=MDS1, y=MDS2, label=rownames(sp1), colour = fire), fontface = "bold")+
+  geom_text(data= sp1, aes(x=MDS1, y=MDS2, label=rownames(sp1), colour = fire), fontface = "bold", size = 6)+
   #labs(title="Pre-Fire")+
-  theme(plot.title = element_text(hjust = 0.5), legend.position = c(1,.15), legend.justification = c(1.1,.9), legend.title = element_blank())+
+  theme(plot.title = element_text(hjust = 0.5), legend.position = c(1,.15), legend.justification = c(1.1,.9), legend.title = element_blank(), legend.text = element_text(size=15))+
   theme(panel.grid = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())+
   scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
-  annotate(geom = "text", 1.5, 1, label = "a)", size = 5, hjust = 1) +
+  annotate(geom = "text", 1.5, 1, label = "a)", size = 6, hjust = 1) +
   #annotate(geom = "text", 1.5, 1, label = "Stress = 0.12", size = 5, hjust = 1)+
   coord_cartesian(ylim = c(-1,1.05))
-
+#POST-STORRIE
 b <- ggplot()+
   geom_point(data=gp2, aes(NMDS1, NMDS2), colour = "darkmagenta", size = 2, alpha = .5)+
-  geom_text(data= sp2, aes(x=MDS1, y=MDS2, label=rownames(sp2), colour = fire), fontface = "bold")+
+  geom_text(data= sp2, aes(x=MDS1, y=MDS2, label=rownames(sp2), colour = fire), fontface = "bold", size = 6)+
   #labs(title="Post-Storrie Fire")+
   theme(plot.title = element_text(hjust = 0.5), legend.position = "")+
   theme(panel.grid = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())+
   scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
-  annotate(geom = "text", 1.5, 1, label = "b)", size = 5, hjust = 1) +
+  annotate(geom = "text", 1.5, 1, label = "b)", size = 6, hjust = 1) +
   #annotate(geom = "text", 1.5, 1, label = "Stress = 0.08", size = 5, hjust = 1)+
   coord_cartesian(ylim = c(-1,1.05))
-
+#POST-CHIPS
 c <- ggplot()+
   geom_point(data=gp3, aes(NMDS1, NMDS2), colour = "grey20", size = 2, alpha = .5)+
-  geom_text_repel(data= sp3, aes(x=MDS1, y=MDS2, label=rownames(sp3), colour = fire), fontface = "bold", force = .01)+
+  geom_text_repel(data= sp3, aes(x=MDS1, y=MDS2, label=rownames(sp3), colour = fire), fontface = "bold", force = .01, size = 6)+
   #geom_text(data= sp3, aes(x=MDS1, y=MDS2, label=rownames(sp3)), fontface = "bold")+
   #labs(title = "Post-Chips Fire")+
   theme(plot.title = element_text(hjust = 0.5), legend.position = "")+
   theme(panel.grid = element_blank(), legend.background = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())+
   scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
-  annotate(geom = "text", 1.5, 1, label = "c)", size = 5, hjust = 1) +
+  annotate(geom = "text", 1.5, 1, label = "c)", size = 6, hjust = 1) +
   #annotate(geom = "text", 1.5, 1, label = "Stress = 0.05", size = 5, hjust = 1)+
   coord_cartesian(ylim = c(-1,1.05))
 
 library(gridExtra)
-grid.arrange(a,b,c, ncol=3, nrow=1)
+all3 <- grid.arrange(a,b,c, ncol=3, nrow=1)
+
+setwd("/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave(all3, filename = "overstory.nmds.tiff", dpi = 300, width = 20, height = 7.5)
 #########################################################
 ##overlays severity values onto ordinations####
 #prep
@@ -228,7 +232,7 @@ Cordi.mite$z <- as.vector(Cordi.grid$z) #unravel the matrix for the z scores
 Cordi.mite.na <- data.frame(na.omit(Cordi.mite)) #gets rid of the nas
 
 ##############
-#Plot
+#PlotS OVERSTORY ORDINATIONS WITH OVERLAID SEVERITY OF EACH FIRE (RdNBR)
 library(directlabels)
 
 PS <- ggplot(gp2, aes(x=NMDS1, y=NMDS2))  +
@@ -237,7 +241,7 @@ PS <- ggplot(gp2, aes(x=NMDS1, y=NMDS2))  +
   #coord_cartesian(xlim = c(-1.5,1.1), ylim = c(-1.5,1.5))+
   stat_contour(data = Sordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
-  annotate(geom = "text", 1.5, 1.1, label = "d)", size = 5, hjust = 1) +
+  annotate(geom = "text", 1.5, 1.1, label = "d)", size = 6, hjust = 1) +
   #text(1.5, 1, label = bquote(r^2==0.49))+
   #labs(colour="Fire severity\n(RdNBR)", title= expression("Post-Storrie Fire (r"^"2"*"=0.49)"))+
   theme(plot.title = element_text(hjust=.5, size=15))
@@ -252,20 +256,13 @@ PC <- ggplot(gp3, aes(x=NMDS1, y=NMDS2))  +
   #coord_cartesian(xlim = c(-1.5,1.1), ylim = c(-1.5,1.5))+
   stat_contour(data = Cordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
-  annotate(geom = "text", 1.5, 1.1, label = "e)", size = 5, hjust = 1) +
+  annotate(geom = "text", 1.5, 1.1, label = "e)", size = 6, hjust = 1) +
   #labs(colour="Fire severity\n(RdNBR)", title=expression("Post-Chips Fire (r"^"2"*"=0.34)"))+
   theme(plot.title = element_text(hjust=.5, size=15), legend.position = "none")
 
 PostChip <- direct.label(PC, method = "top.points")
 
-grid.arrange(PostSto, PostChip, ncol = 2)
+both <- grid.arrange(PostSto, PostChip, ncol = 2)
 
-##############
-###Mantel Tests
-man1 <- mantel(pre.trees.dist, pS.trees.dist)
-man1
-man2 <- mantel(pC.trees.dist, pS.trees.dist)
-man2
-man3 <- mantel(pre.trees.dist, pC.trees.dist)
-man3
-
+setwd("/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave(both, filename = "overstory.with.severity.nmds.tiff", dpi = 300, width = 15, height = 7.5)
