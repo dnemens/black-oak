@@ -2,8 +2,9 @@
 library(car)
 library(multcomp)
 library(tidyverse)
+library(RColorBrewer)
 
-#Univariate stats on change in overstory importance values pre-fire to post-Storrie
+#categorical stats on change in overstory importance values pre-fire to post-Storrie
 
 #load long form importance data
 long <- read.csv(file = "C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/mean.import.over.long.csv")
@@ -26,11 +27,25 @@ imps <- imps.long$Importance.Value
 ts <- as.factor(imps.long$time_Sev)
 sev <- as.factor(imps.long$Storrie)
 
+#Pre vs. post-storrie by species only, severity lumped
+ggplot(imps.long, aes(x=Species, y=Importance.Value, fill = Species)) +
+  geom_boxplot()+
+  facet_wrap(~time)+
+  theme(legend.position = "null")
+
+
+####Post-Storrie condition by species and severity
 ggplot(imps.long, aes(x=sev, y=Importance.Value, fill = Species)) +
   geom_boxplot()+
   facet_wrap(~Species)+
   theme(legend.position = "null")
 
+#Pre-Storrie composition by species
+pre.fire <- subset(imps.long, time == "Pre-fire")
+                   
+ggplot(pre.fire, aes(x=Species, y=Importance.Value, fill = Species)) +
+  geom_boxplot()+
+  theme(legend.position = "null", element_text(size=5))
 ########################
 #ANOVAS
 #ABCO ###
@@ -123,25 +138,23 @@ hist(q.mod$residuals)
 
 #Tukey comparison
 qtuk <- glht(q.mod, linfct = mcp(qSto = "Tukey"))
-summary(atuk)
-cld(atuk)
-plot(cld(tuk), main = "QUKE")
+summary(qtuk)
+cld(qtuk)
+plot(cld(qtuk), main = "QUKE")
 
 ################################
 #T-TESTS (or similar) for pre-to-post fire comparison for each species
 #ABCO
 abco1 <- subset(abimps, abimps$Storrie == 1)
 
-ab.pre1 <- aimp1[which(abco1$time == "Pre-fire")]
-ab.post1 <- aimp1[which(abco1$time == "Post-Storrie Fire")]
+ab.pre1 <- abco1$Importance.Value[which(abco1$time == "Pre-fire")]
+ab.post1 <- abco1$Importance.Value[which(abco1$time == "Post-Storrie Fire")]
 
 var.test(ab.pre1, ab.post1)
 qqplot(ab.pre1, ab.post1)
 
-t.test(ab.preset, ab.post, var.equal = T)
+t.test(ab.pre1, ab.post1, var.equal = T)
 
-a.un <- t.test(aimp1~atime1)
-a.un
 
 abco2 <- subset(abimps, abimps$Storrie == 2)
 aimp2 <- abco2$Importance.Value

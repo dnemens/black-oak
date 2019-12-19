@@ -2,6 +2,7 @@
 
 library(tidyverse)
 library(RColorBrewer)
+library(gridExtra) 
 
 #import data sheet -- long form mean importance values
 import <-  read.csv("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/mean.import.over.long.csv", header = T)
@@ -52,49 +53,84 @@ import.postC <- subset(import.sum2, time == "Post-Chips Fire")
 import.postC$comb <- factor(import.postC$comb, levels = c("Unburned/Unburned", "Unburned/Low","Unburned/Moderate", "Unburned/High","Low/Unburned", "Low/Low", "Low/Moderate","Low/High","Moderate/Unburned", "Moderate/Low", "Moderate/Moderate", "Moderate/High",  "High/Unburned", "High/Low", "High/Moderate", "High/High"), ordered = is.ordered(import.postC$comb))
 
 ##PLot!
-#colors <- brewer.pal(n = 6, name = "RdBu")
-colors <- c('#fafac4', '#f9f17f', '#fd8d3c','#d94801','#86131f','#430a0f') #sequential, greyscaleable
+colors <- brewer.pal(n = 6, name = "RdBu")
+#colors <- c('#fafac4', '#f9f17f', '#fd8d3c','#d94801','#86131f','#430a0f') #sequential, greyscaleable
 colorsG <- ColToGray(colors) #converts to greyscale
 
 pre <- ggplot(import.pre, aes(y=mean, x=Storrie, fill=Species)) + 
   geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
-  scale_fill_manual(values= colors, name = "Species")+
+  scale_fill_manual(values= rev(colors), name = "Species")+
   ylab("Importance Value")+
-  #xlab("Storrie Severity")+
+  xlab("Storrie Severity")+
   #labs(title = "Mean Pre-fire Importance Values")+
-  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5), axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2))+
+  theme(panel.background = element_blank(), axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(size = 25), axis.text = element_text(size = 20))+
+  theme(legend.position = c(.5, .9), legend.title = element_blank(), legend.text = element_text(size = 15), legend.direction  = "horizontal")+
+  guides(fill = guide_legend(nrow = 1, byrow = TRUE, direction = "horizontal"))+
   scale_y_continuous(limits = c(0,315))+
   theme(plot.margin = margin(0, 1, 6, 1, "pt"))+
-  annotate(geom = "text", .5, 300, label = "a)", size = 5)
+  annotate(geom = "text", 4.2, 300, label = "a)", size = 7, fontface="bold")
 
 postS <- ggplot(import.postS, aes(y=mean, x=Storrie, fill=Species)) + 
   geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
-  scale_fill_manual(values= colors, name = "Species")+
+  scale_fill_manual(values= rev(colors), name = "Species")+
   ylab("Importance Value")+
-  #xlab("Storrie Severity")+
+  xlab("Storrie Severity")+
   #labs(title = "Mean Post-Storrie Importance Values")+
-  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5), legend.position = 0, axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2))+
-  scale_y_continuous(limits = c(0,315))+
-  theme(plot.margin = margin(0, 70, 5, 1, "pt"))+
-  annotate(geom = "text", .5, 300, label = "b)", size = 5)
+  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5), legend.position = 0, axis.ticks.x = element_blank(), axis.title = element_text(size = 25), axis.text = element_text(size = 20))+
+    scale_y_continuous(limits = c(0,315))+
+  theme(plot.margin = margin(0, 1, 5, 1, "pt"))+
+  annotate(geom = "text", 4.2, 300, label = "b)", size = 7, fontface="bold")
+
+two <- grid.arrange(pre, postS, nrow = 2)
+
+setwd("C:/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave(two, filename = "meanIVstop2.leg.tiff", dpi = 300, width = 10, height = 10)
 
 postC <- ggplot(import.postC, aes(y=mean, x=comb, fill=Species)) + 
   geom_bar (stat= "summary", fun.y = "mean", width = .5, position = position_dodge(.7))+
   geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.7), width = .4)+
-  scale_fill_manual(values= colors, name = "Species")+
+  scale_fill_manual(values= rev(colors), name = "Species")+
   ylab("Importance Value")+
   xlab("Fire Severity")+
   #labs(title = "Mean Post-Chips Importance Values", hjust = .5)+
-  theme(axis.text.x = element_text(angle = 45), legend.position = 0, panel.grid = element_blank(), plot.title = element_text(hjust = 0.5), panel.background = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2))+
+  theme(axis.text.x = element_text(angle = 45), legend.position = 0, panel.grid = element_blank(), plot.title = element_text(hjust = 0.5), panel.background = element_blank(), axis.ticks.x = element_blank(), axis.title = element_text(face = 2, size = 25), axis.text = element_text(size = 20))+
   theme(plot.margin = margin(0, 0, 0, 1, "pt"))+
-  theme(axis.title.x = element_text(margin = margin(t = -20, r = 0, b = 0, l = 0)))+
-  annotate(geom = "text", .8, 300, label = "c)", size = 5)
+  theme(axis.title.x = element_text(margin = margin(t = -20, r = 0, b = 0, l = 0)))
+  #annotate(geom = "text", .8, 300, label = "c)", size = 5)
 
-library(gridExtra)
-grid.arrange(pre, postS, postC, nrow = 3)
+all <- grid.arrange(pre, postS, postC, nrow = 3)
 
+setwd("/Users/debne/Dropbox/CBO/black-oak/plots")
+ggsave(all, filename = "meanIVs.tiff", dpi = 300, width = 12, height = 15)
+
+
+########################################################################
+#Pre-fire plot with all sev's combined
+#Prep for error bars
+import.sum3 <- import.comb %>%
+  group_by(Species, time) %>%
+  summarise(N = length(Importance.Value),
+            mean = mean(Importance.Value),
+            sd   = sd(Importance.Value),
+            se   = sd / sqrt(N))
+
+import.pre3 <- subset(import.sum3, time == "Pre-fire")
+
+pre2 <- ggplot(import.pre3, aes(y=mean, x=Species, fill=Species)) + 
+  geom_bar (stat= "summary", fun.y = "mean", position = "dodge")+
+  geom_errorbar(aes(ymin = mean-se, ymax = mean+se), position = position_dodge(.9), width = .4)+
+  scale_fill_manual(values= rev(colors), name = "Species", labels = c("White fir", "Incense-cedar", "Sugar pine", "Ponderosa", "Douglas-fir", "Black oak"))+
+  ylab("Importance Value")+
+  #labs(title = "Mean Pre-fire Importance Values")+
+  theme(panel.background = element_blank(), plot.title = element_text(hjust = 0.5), axis.title.x = element_blank(), axis.ticks.x = element_blank(), axis.title.y = element_text(size=25), axis.text.y = element_text(size=18), axis.text.x = element_blank(), legend.position = "null")+
+  scale_y_continuous(limits = c(0,315))+ 
+  theme(axis.text.x = element_blank(), legend.position = "right", legend.title = element_blank(), legend.text = element_text(size=20), legend.key.height = unit(1.1, "cm"))+
+  theme(plot.margin = margin(0, 1, 0, 3, "pt"))
+
+setwd("/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave(pre2, filename = "meanIVs.pre.tiff", dpi = 300, width = 7, height = 5)
 
 #### histograms of diam distr
 comp <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.KSQ.KCQ.csv")

@@ -8,6 +8,7 @@ library(RColorBrewer)
 ############################################################
 #import raw overstory data 
 comp <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/overstory.KSQ.KCQ.csv")
+comp <- read.csv ("C:/Users/debne/Dropbox/CBO/black-oak/data sheets/overstory.KSQ.KCQ.csv")
 comp[is.na(comp)] <- 0
 
 comp <- comp %>%
@@ -87,7 +88,7 @@ pC.trees <- comp %>%
   filter(Spp %in% c("ABCO", "CADE", "PILA", "PIPO", "PSME", "QUKE")) 
 
 #Adds in dbh of Storrie/Chips sprouts from focal oak data - multiplied by num of clumps in each plot
-qukeC <- qukes %>%
+qukeC <- qukes %>% 
   mutate(Chips.dbh = ((Sldiam+Cldiam)*clumps))
 
 #filter out QUKE from other spps 
@@ -118,6 +119,7 @@ PC.trees.R <- decostand(pC.trees, "total")
 #################
 
 #import shrub data (center sub-plot)
+center <- read.csv("C:/Users/debne/Dropbox/CBO/chaparral/center data/data sheets/center sub plot.csv", header = T)
 center <- read.csv("C:/Users/dnemens/Dropbox/CBO/chaparral/center data/data sheets/center sub plot.csv", header = T)
 
 #summarizes data sheet, giving total crown area per species for each plot
@@ -131,7 +133,7 @@ cover <- spread(cover, key = "Spp", value = "cover", fill = 0.0)
 cover <- cover[,3:41]
 
 #removes rare species
-cover.C <- vegtab(taxa = cover, minval = (.05*nrow(cover)))
+cover.C <- vegtab(cover, minval = (.05*nrow(cover)))
 
 ####
 #combines Post-Chips trees with shrub layer
@@ -161,6 +163,7 @@ cor(pc.tsR, z$points)
 
 #overlay continuous fire severity (rdnbr) for both fires
 #load csv with predictor variables
+rdnbr <- read.csv ("C:/Users/debne/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
 rdnbr <- read.csv ("C:/Users/dnemens/Dropbox/CBO/black-oak/data sheets/rdnbr.csv")
 
 S.ord <- ordisurf(z, rdnbr$storrie_rdnbr, bubble = 4, main = "storrie RdNBR")
@@ -195,24 +198,47 @@ library(ggrepel)
 library(grid)
 library(gridExtra)
 
-gz <- data.frame(scores(z), rdnbr$storrie_rdnbr, rdnbr$chips_rdnbr)
+#gz <- data.frame(scores(z), rdnbr$storrie_rdnbr, rdnbr$chips_rdnbr)
+gz <- data.frame(scores(z), rdnbr$chips_rdnbr)
 sp <- data.frame(sp)
 spp <- rownames(sp)
 
 #compare gam vs. ordisurf
-mod <- gam(rdnbr$storrie_rdnbr~s(gz$NMDS1, gz$NMDS2))
+mod <- gam(rdnbr$chips_rdnbr~s(gz$NMDS1, gz$NMDS2))
 summary(mod)
 mod2 <- gam(rdnbr$chips_rdnbr~s(gz$NMDS1, gz$NMDS2), method = "REML")
 summary(mod2)
 
-sp$fire = as.factor(c(1,1,2,2,1,2,2,2,2,2,2,1,2,2,2,1,1,2))
+sp$fire = as.factor(c(1,1,2,2,2,3,3,2,1,3,3,1,2,2,2,1,2,3))
+fire <- sp$fire
+colors2 <- c("black","darkorange", "red")
 
 # Create a text grob <- grobTree(textGrob("Scatter plot", x=0.1,  y=0.95, hjust=0, gp=gpar(col="red", fontsize=13, fontface="italic")))
 # Plot sp2 + annotation_custom(grob)
  # 
 #######################
-#OVERLAYS RdNBR FOR EACH FIRE ON ORDINATION OF COMBINED STRATA  
-#STORRIE
+#OVERLAYS RdNBR FOR BOTH FIRES ON ORDINATION OF COMBINED STRATA  
+SC <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
+  geom_point(alpha = .3, size=2)+
+  theme(panel.grid = element_blank(), panel.background = element_rect(fill="white", colour = "black"), axis.text = element_blank(), axis.ticks = element_blank(), legend.title = element_blank())+
+  coord_cartesian(xlim = c(-1.6, 1.2))+
+  stat_contour(data = Cordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
+  stat_contour(data = Sordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
+  scale_color_gradient(low = "green", high ="red", guide = "none")+
+  geom_text_repel(data= sp, aes(x=MDS1, y=MDS2, label=rownames(sp)), colour=fire, fontface = "bold", force = .06, size=7)+
+  scale_color_manual (values = colors2, label= c("Fire Sensitive", "Fire Tolerant", "Fire Tolerant (HS)"), guide = "none")+
+  theme(plot.title = element_text(hjust=.5, size=15))+
+  #geom_text_repel(data= sp, aes(x=MDS1, y=MDS2, label=rownames(sp)), colour = c("black", "black", "darkorange", "darkorange", "darkorange", "red", "red", "darkorange", "black", "red", "red", "black", "darkorange", "darkorange", "darkorange", "black", "darkorange", "red"), fontface = "bold", force = .06, size=8)+
+    theme(legend.position = c(1,0), legend.justification = c(1,0))+
+  annotate(geom = "text", -1.7, .2, label ="Mixed -\nconifer \nForest", colour = "green4", size = 7, fontface = "bold", hjust = 0)+
+  annotate(geom = "text", 1.15, .2, label ="Oak -\nshrub", colour = "green4", size = 7, fontface = "bold")
+
+#add rdnbr value labels to contours  
+StoChip <- direct.label(SC, "top.points")
+
+setwd("/Users/dnemens/Dropbox/CBO/black-oak/plots")
+ggsave(SC, filename = "combined.strata.nmds.Bothsev.tiff", dpi = 300, width = 7, height = 6)
+#STORRIE ONLY
 a <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   geom_point(aes(), alpha = .3, size=2)+
   theme(panel.grid = element_blank(), panel.background = element_rect(fill="white", colour = "black"),  axis.ticks = element_blank(), axis.text = element_blank(),legend.position = c(1,0), legend.justification = c(1,0))+
@@ -226,44 +252,55 @@ a <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   annotate(geom = "text", 1.15, .2, label ="Oak -\nshrub", colour = "green4", size = 7, fontface = "bold")
 Sto <- direct.label(a, "top.points")
 
-#CHIPS
+############fire <- sp$fire[]
+
+#POST CHIPS with Overlay
 b <- ggplot(gz, aes(x=NMDS1, y=NMDS2))  +
   geom_point(alpha = .3, size=2)+
   theme(panel.grid = element_blank(), panel.background = element_rect(fill="white", colour = "black"), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(1,0), legend.justification = c(1,0))+
-  coord_cartesian(xlim = c(-1.6, 1.2), ylim = c(-1.6,1.5))+
+  coord_cartesian(xlim = c(-1.6, 1.2))+
   stat_contour(data = Cordi.mite.na, aes(x = x, y = y, z = z, colour = ..level..), cex=1.1)+
   scale_color_gradient(low = "green", high ="red")+
-  #labs(colour="Fire severity\n(RdNBR)", title=expression("Chips Fire (r"^"2"*"=0.35)"))+
+    #labs(colour="Fire severity\n(RdNBR)", title=expression("Chips Fire (r"^"2"*"=0.35)"))+
+  geom_text_repel(data= sp, aes(x=MDS1, y=MDS2, label=rownames(sp)), colour = c("black", "black", "darkorange", "darkorange", "darkorange", "red", "red", "darkorange", "black", "red", "red", "black", "darkorange", "darkorange", "darkorange", "black", "darkorange", "red"), fontface = "bold", force = .01, size=8)+
+  #scale_color_manual(values = c("black", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
+  #geom_text(data= sp, aes(x=MDS1, y=MDS2, label=rownames(sp)), colour=c("blue", "blue", "red", "red", "blue", "red", "red", "blue"), fontface = "bold", size = 8)+
   theme(plot.title = element_text(hjust=.5, size=15), legend.position = "none")+
   annotate(geom = "text", -1.7, .2, label ="Mixed -\nconifer \nForest", colour = "green4", size = 7, fontface = "bold", hjust = 0)+
-  annotate(geom = "text", 1.15, .2, label ="Oak -\nshrub", colour = "green4", size = 7, fontface = "bold")+
-  annotate(geom = "text", 1.1, 1.5, label ="b)", size = 6, fontface = "bold")
+  annotate(geom = "text", 1.15, .2, label ="Oak -\nshrub", colour = "green4", size = 7, fontface = "bold")
+  #annotate(geom = "text", 1.1, 1.5, label ="b)", size = 6, fontface = "bold")
 
+#adds RdNBR values to lines
 Chip <- direct.label(b, "top.points")
+Chip
 
-#SPECIES CENTOIDS AFTER CHIPS                     
+#SPECIES CENTROIDS AFTER CHIPS - No rDNBR Overlay                    
 c <- 
-  ggplot()  +
-  geom_point(data=gz, aes(x=NMDS1, y=NMDS2), alpha = .3, size = 2)+
+  ggplot(data=gz, aes(x=NMDS1, y=NMDS2))  +
+  geom_point(alpha = .3, size = 2)+
   #geom_text(data= sp, aes(x=MDS1, y=MDS2, label=spp), colour = "red", position=position_jitter(width=.08, height = .08))+
   geom_text_repel(data= sp, aes(x=MDS1, y=MDS2, label=rownames(sp), colour=fire), fontface = "bold", force = .01, size=8)+
   theme(panel.grid = element_blank(), legend.title = element_blank(), legend.text = element_text(size=12), panel.background = element_rect(fill="white", colour = "black"), axis.text = element_blank(), axis.ticks = element_blank(), legend.position = c(.01,.99), legend.justification = c(0,1))+
   #Position legend in graph, where x,y is 0,0 (bottom left) to 1,1 (top right)
-  coord_cartesian(xlim = c(-1.6, 1.2), ylim = c(-1.6,1.5))+
-  scale_color_manual(values = c("blue", "red"), labels = c("Fire Sensitive", "Fire Tolerant"))+
-  annotate(geom = "text", -1.7, .2, label ="Mixed -\nconifer \nForest", colour = "green4", size = 7, fontface = "bold", hjust = 0)+
-  annotate(geom = "text", 1.15, .2, label ="Oak -\nshrub", colour = "green4", size = 7, fontface = "bold")+
-  annotate(geom = "text", 1.1, 1.5, label ="c)", size = 6, fontface = "bold")
-
+  coord_cartesian(xlim = c(-1.7, 1.3))+
+  scale_color_manual(values = c("black","darkorange", "red"), labels = c("Fire Sensitive", "Fire Tolerant", "Fire Tolerant (HS)"))
+  #annotate(geom = "text", -1.8, .3, label ="Mixed -\nconifer \nForest", colour = "green4", size = 7, fontface = "bold", hjust = 0)+
+  #annotate(geom = "text", 1.1, 1.5, label = bquote(r^2 == 0.34), size = 6, fontface = "bold")+
+  #annotate(geom = "text", 1.15, .2, label ="Oak -\nshrub", colour = "green4", size = 7, fontface = "bold")
+  #annotate(geom = "text", 1.1, 1.5, label ="c)", size = 6, fontface = "bold")
+   
 #creates uniform widths for plots
 #Sto <- ggplot_gtable(ggplot_build(Sto))
 #maxWidth = unit.pmax(Chip$widths[5:3], Sto$widths[5:3])
 #Chip$widths[5:3] <- maxWidth
 #Sto$widths[5:3] <- maxWidth
 
-#stack both ggplots
+#stack 3 ggplots
 all <- grid.arrange(Sto, Chip, c, nrow=1, ncol=3)
 
 setwd("/Users/dnemens/Dropbox/CBO/black-oak/plots")
-ggsave(all, filename = "combined.strata.nmds.tiff", dpi = 300, width = 20, height = 7.5)
+ggsave(all, filename = "combined.strata.nmds.tiff", dpi = 300, width = 10, height = 3.5)
 
+#saves single plots
+ggsave(Chip, filename = "combined.strata.nmds.sev.tiff", dpi = 300, width = 7, height = 6)
+ggsave(c, filename = "combined.strata.nmds.tiff", dpi = 300, width = 7, height = 6)
